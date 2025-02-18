@@ -1,3 +1,4 @@
+using chatapptestnotborken.Hubs;
 using MudBlazor.Services;
 using ComputingProject.Client.Pages;
 using ComputingProject.Components;
@@ -6,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
+
+builder.Services.AddSignalR();
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -26,9 +30,11 @@ else
 }
 
 app.UseHttpsRedirection();
-
-
+app.UseStaticFiles(); 
+app.UseRouting();  
 app.UseAntiforgery();
+
+app.MapHub<ChatHub>("/chatHub"); 
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
