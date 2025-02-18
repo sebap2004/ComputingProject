@@ -7,16 +7,42 @@
 
 @if (IsConnected)
 {
-    <input type="text" @bind="UserInput"/>
-    <input type="text" @bind="MessageInput"/>
-    <button @onclick="Send">Send</button>
-
-    <ul id="messagesList">
-        @foreach (var message in messages)
-        {
-            <li>@message</li>
-        }
-    </ul>
+    <div class="d-flex flex-column flex-grow-1 gap-4">
+        <MudPaper MinHeight="90%">
+            <ul id="messagesList">
+                @foreach (var message in messages)
+                {
+                    if (message.user == UserInput)
+                    {
+                        <MudChat ChatPosition="ChatBubblePosition.End">
+                            <MudChatHeader Name="@message.user" />
+                            <MudChatBubble>@message.message</MudChatBubble>
+                        </MudChat>
+                    }
+                    else
+                    {
+                        <MudChat ChatPosition="ChatBubblePosition.Start">
+                            <MudChatHeader Name="@message.user" />
+                            <MudChatBubble>@message.message</MudChatBubble>
+                        </MudChat>
+                    }
+                }
+            </ul>
+        </MudPaper>
+        <MudPaper Height="10%">
+            <div class="d-flex flex-grow-1 gap-4">
+                <MudPaper Width="30%">
+                    <MudTextField Class="flex" @bind-Value="UserInput" Variant="Variant.Outlined" Label="Name"/>
+                </MudPaper>
+                <MudPaper Width="50%">
+                    <MudTextField @bind-Value="MessageInput" Variant="Variant.Outlined" Label="Message"/>
+                </MudPaper>
+                <MudPaper Width="20%" Class="d-flex justify-center align-content-center">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="Send">Send Message</MudButton>
+                </MudPaper>
+            </div>
+        </MudPaper>
+    </div>
 }
 else
 {
@@ -25,18 +51,22 @@ else
 
 @code {
     private HubConnection _hubConnection;
-    private List<string> messages = new List<string>();
-    private string UserInput;
+    private List<Message> messages = new List<Message>();
+    private string UserInput { get; set; }
     private string MessageInput;
 
     protected override async Task OnInitializedAsync()
     {
         _hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/chatHub")).Build();
 
-        _hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        _hubConnection.On<string, string>("ReceiveMessage", (puser, pmessage) =>
         {
-            var encodedMsg = $"{user}: {message}";
-            messages.Add(encodedMsg);
+            Message message = new Message()
+            {
+                user = puser,
+                message = pmessage
+            };
+            messages.Add(message);
             StateHasChanged();
         });
 
@@ -46,4 +76,11 @@ else
     Task Send() => _hubConnection.SendAsync("SendMessage", UserInput, MessageInput);
 
     public bool IsConnected => _hubConnection.State == HubConnectionState.Connected;
+    
+    public struct Message
+    {
+        public string user;
+        public string message;
+    }
+
 }
