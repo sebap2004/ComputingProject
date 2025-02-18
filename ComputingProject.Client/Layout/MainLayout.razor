@@ -1,5 +1,12 @@
 ﻿@inherits LayoutComponentBase
-
+<script>
+    function scrollToBottom(elementId) {
+        var element = document.getElementById(elementId);
+        if (element) {
+            element.scrollTop = element.scrollHeight;
+        }
+    }
+</script>
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />

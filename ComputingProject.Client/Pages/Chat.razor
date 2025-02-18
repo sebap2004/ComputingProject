@@ -1,43 +1,39 @@
 ﻿@page "/chat"
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @rendermode InteractiveWebAssembly
 
-<h3>Chat</h3>
 
 @if (IsConnected)
 {
-    <div class="d-flex flex-column flex-grow-1 gap-4">
-        <MudPaper MinHeight="90%">
-            <ul id="messagesList">
-                @foreach (var message in messages)
+    <MudText Typo="Typo.h3">Connected successfully!</MudText>
+    <div class="d-flex flex-column flex-grow-1 gap-4" style="height: 80vh">
+        <MudPaper MinHeight="90%" Class="overflow-auto" id="chatscroll">
+            @foreach (var message in messages)
+            {
+                if (message.user == UserInput)
                 {
-                    if (message.user == UserInput)
-                    {
-                        <MudChat ChatPosition="ChatBubblePosition.End">
-                            <MudChatHeader Name="@message.user" />
-                            <MudChatBubble>@message.message</MudChatBubble>
-                        </MudChat>
-                    }
-                    else
-                    {
-                        <MudChat ChatPosition="ChatBubblePosition.Start">
-                            <MudChatHeader Name="@message.user" />
-                            <MudChatBubble>@message.message</MudChatBubble>
-                        </MudChat>
-                    }
+                    <MudChat ChatPosition="ChatBubblePosition.End">
+                        <MudChatHeader Name="@message.user" />
+                        <MudChatBubble>@message.message</MudChatBubble>
+                    </MudChat>
                 }
-            </ul>
+                else
+                {
+                    <MudChat ChatPosition="ChatBubblePosition.Start">
+                        <MudChatHeader Name="@message.user" />
+                        <MudChatBubble>@message.message</MudChatBubble>
+                    </MudChat>
+                }
+            }
         </MudPaper>
-        <MudPaper Height="10%">
+        <MudPaper Height="10%" Class="h-10">
             <div class="d-flex flex-grow-1 gap-4">
-                <MudPaper Width="30%">
-                    <MudTextField Class="flex" @bind-Value="UserInput" Variant="Variant.Outlined" Label="Name"/>
+                <MudPaper Width="89%">
+                    <MudTextField @bind-Value="MessageInput" Immediate="true" Variant="Variant.Outlined" @onkeydown="@Enter" Label="Message"/>
                 </MudPaper>
-                <MudPaper Width="50%">
-                    <MudTextField @bind-Value="MessageInput" Variant="Variant.Outlined" Label="Message"/>
-                </MudPaper>
-                <MudPaper Width="20%" Class="d-flex justify-center align-content-center">
+                <MudPaper Width="10%" Class="d-flex justify-center">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="Send">Send Message</MudButton>
                 </MudPaper>
             </div>
@@ -46,16 +42,21 @@
 }
 else
 {
-    <span>Connecting...</span>
+    <MudText Typo="Typo.h2">Welcome to freaking awesome chat</MudText>
+    <MudPaper Class="d-flex flex-grow-1 gap-4 flex-column">
+        <MudTextField Margin="Margin.Normal" Class="flex" @bind-Value="UserInput" Variant="Variant.Outlined" Label="Name"/>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ConnectToHub">Connect to Chat server</MudButton>
+    </MudPaper>
 }
 
 @code {
+    
     private HubConnection _hubConnection;
     private List<Message> messages = new List<Message>();
     private string UserInput { get; set; }
     private string MessageInput;
 
-    protected override async Task OnInitializedAsync()
+    public async Task ConnectToHub()
     {
         _hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/chatHub")).Build();
 
@@ -67,16 +68,44 @@ else
                 message = pmessage
             };
             messages.Add(message);
+            
             StateHasChanged();
+            
+            JSRuntime.InvokeVoidAsync("scrollToBottom", "chatscroll");
+            
         });
 
         await _hubConnection.StartAsync();
     }
 
-    Task Send() => _hubConnection.SendAsync("SendMessage", UserInput, MessageInput);
-
-    public bool IsConnected => _hubConnection.State == HubConnectionState.Connected;
+    async Task Send()
+    {
+        if (string.IsNullOrWhiteSpace(MessageInput)) return;
     
+        var tempMessage = MessageInput;
+        MessageInput = string.Empty; // Clear input before sending
+        StateHasChanged(); // Ensure UI updates before sending the message
+
+        await _hubConnection.SendAsync("SendMessage", UserInput, tempMessage);
+    }
+
+    private async Task Enter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await Send();
+        }
+    }
+    
+    public bool IsConnected
+    {
+        get
+        {
+            if (_hubConnection == null) return false;
+            return _hubConnection.State == HubConnectionState.Connected;
+        }
+    }
+
     public struct Message
     {
         public string user;
