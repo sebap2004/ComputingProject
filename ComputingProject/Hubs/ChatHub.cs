@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using ComputingProject.Client.Services;
+using Microsoft.AspNetCore.SignalR;
 
-namespace chatapptestnotborken.Hubs;
+namespace ComputingProject.Hubs;
 
-public class ChatHub : Hub
+
+public class ChatHub : Hub<IChatHubClient>, IChatHubServer
 {
-    public async Task SendMessage(string user, string message, bool systemMessage)
+    public async Task SendMessage(string sender, string content, bool systemMessage)
     {
-        await Clients.All.SendAsync("ReceiveMessage", user, message, systemMessage);
+        await Clients.All.ReceiveMessage(sender, content, systemMessage);
     }
 }

@@ -1,7 +1,10 @@
-using chatapptestnotborken.Hubs;
 using MudBlazor.Services;
 using ComputingProject.Client.Pages;
+using ComputingProject.Client.Services;
 using ComputingProject.Components;
+using ComputingProject.Hubs;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMudServices();
 
 builder.Services.AddSignalR();
+
+
+
 
 
 // Add services to the container.

@@ -1,11 +1,14 @@
 ﻿@page "/chat"
+@using ComputingProject.Client.Services
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveWebAssembly
 @inject ISnackbar Snackbar
+@inject ChatHubClientService ChatService
+@inject ChatHubServerProxy ChatServer
 
-@if (IsConnected)
+@if (ChatServer.IsConnected)
 {
     <div class="d-flex flex-column flex-grow-1 gap-4" style="height: 84vh">
         <MudPaper MinHeight="95%" Class="overflow-auto" id="chatscroll">
@@ -57,16 +60,14 @@ else
 
 @code {
     
-    private HubConnection _hubConnection;
     private List<Message> messages = new List<Message>();
     private string UserInput { get; set; }
     private string MessageInput;
 
     public async Task ConnectToHub()
     {
-        _hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/chatHub")).Build();
         
-        _hubConnection.On<string, string, bool>("ReceiveMessage", (puser, pmessage, system) =>
+        ChatService.OnMessageReceived += (puser, pmessage, system) =>
         {
             Message message = new Message()
             {
@@ -78,14 +79,16 @@ else
             
             StateHasChanged();
             
-            JSRuntime.InvokeVoidAsync("scrollToBottom", "chatscroll");
-            
-        });
-
-        await _hubConnection.StartAsync();
+            // JSRuntime.InvokeVoidAsync("scrollToBottom", "chatscroll");
+        };
         
-        await _hubConnection.SendAsync("SendMessage", UserInput, UserInput + " has joined the chat!", true);
+        await ChatService.StartAsync();
+        
+        await ChatServer.SendMessage(UserInput, UserInput + " has joined the chat!", true);
 
+        Console.WriteLine(ChatServer);
+        Console.WriteLine(ChatService);
+        
         Snackbar.Clear();
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
         Snackbar.Add("Successfully connected to chat", Severity.Success);
@@ -99,7 +102,7 @@ else
         MessageInput = string.Empty; // Clear input before sending
         StateHasChanged(); // Ensure UI updates before sending the message
 
-        await _hubConnection.SendAsync("SendMessage", UserInput, tempMessage, false);
+        await ChatServer.SendMessage(UserInput, tempMessage, false);
     }
 
     private async Task Enter(KeyboardEventArgs e)
@@ -107,15 +110,6 @@ else
         if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
             await Send();
-        }
-    }
-    
-    public bool IsConnected
-    {
-        get
-        {
-            if (_hubConnection == null) return false;
-            return _hubConnection.State == HubConnectionState.Connected;
         }
     }
 
