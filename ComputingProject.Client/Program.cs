@@ -10,18 +10,17 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddMudServices();
 
-builder.Services.AddScoped(sp =>
+builder.Services.AddSingleton(sp =>
 {
     var navigation = sp.GetRequiredService<NavigationManager>();
     return new HubConnectionBuilder()
-        .WithUrl(navigation.ToAbsoluteUri("/chathub")) // Ensure this URL is correct for your SignalR hub
+        .WithUrl(navigation.ToAbsoluteUri("/chatHub"))
         .Build();
 });
 
 
-
 builder.Services.AddScoped<ChatHubClientService>();
-
 builder.Services.AddScoped<ChatHubServerProxy>();
+
 
 await builder.Build().RunAsync();

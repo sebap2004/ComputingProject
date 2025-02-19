@@ -3,18 +3,17 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ComputingProject.Client.Services;
 
-public class ChatHubClientService : IChatHubClient
+public class ChatHubClientService : IChatHubClient  
 {
     private readonly HubConnection _hubConnection;
+    public bool IsConnected => _hubConnection.State == HubConnectionState.Connected;
 
     public event Action<string, string, bool>? OnMessageReceived;
 
-    public ChatHubClientService(NavigationManager navigation)
+    public ChatHubClientService(HubConnection hubConnection)
     {
         Console.WriteLine("Added ChatHubClientService");
-        _hubConnection = new HubConnectionBuilder()
-            .WithUrl(navigation.ToAbsoluteUri("/chatHub"))
-            .Build();
+        _hubConnection = hubConnection;
         _hubConnection.On<string, string, bool>("ReceiveMessage", (user, message, systemMessage) =>
         {
             OnMessageReceived?.Invoke(user, message, systemMessage);
@@ -23,8 +22,16 @@ public class ChatHubClientService : IChatHubClient
 
     public async Task StartAsync()
     {
-        Console.WriteLine("Started chat hub connection");
-        await _hubConnection.StartAsync();
+        try
+        {
+            Console.WriteLine("Starting chat hub connection...");
+            await _hubConnection.StartAsync();
+            Console.WriteLine("Chat hub connection started successfully. Current state: " + _hubConnection.State);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error starting chat hub connection: {ex.Message}");
+        }
     }
 
     public async Task StopAsync()
@@ -37,3 +44,4 @@ public class ChatHubClientService : IChatHubClient
         OnMessageReceived?.Invoke(sender, content, systemMessage);
     }
 }
+

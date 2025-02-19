@@ -5,12 +5,10 @@ namespace ComputingProject.Client.Services;
 public class ChatHubServerProxy : IChatHubServer
 {
     private readonly HubConnection _hubConnection;
-
-    public bool IsConnected => _hubConnection.State == HubConnectionState.Connected;
     
     public ChatHubServerProxy(HubConnection hubConnection)
     {
-        Console.WriteLine("Added ChatHubClientService");
+        Console.WriteLine("Added ChatHubCl+ientService");
         _hubConnection = hubConnection;
     }
 
