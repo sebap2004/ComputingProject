@@ -3,28 +3,34 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveWebAssembly
-
+@inject ISnackbar Snackbar
 
 @if (IsConnected)
 {
-    <MudText Typo="Typo.h3">Connected successfully!</MudText>
-    <div class="d-flex flex-column flex-grow-1 gap-4" style="height: 80vh">
-        <MudPaper MinHeight="90%" Class="overflow-auto" id="chatscroll">
+    <div class="d-flex flex-column flex-grow-1 gap-4" style="height: 84vh">
+        <MudPaper MinHeight="95%" Class="overflow-auto" id="chatscroll">
             @foreach (var message in messages)
             {
-                if (message.user == UserInput)
+                if (message.systemMessage)
                 {
-                    <MudChat ChatPosition="ChatBubblePosition.End">
-                        <MudChatHeader Name="@message.user" />
-                        <MudChatBubble>@message.message</MudChatBubble>
-                    </MudChat>
+                    <MudAlert ContentAlignment="HorizontalAlignment.Center" Severity="Severity.Info" Dense="true">@message.message</MudAlert>
                 }
                 else
                 {
-                    <MudChat ChatPosition="ChatBubblePosition.Start">
-                        <MudChatHeader Name="@message.user" />
-                        <MudChatBubble>@message.message</MudChatBubble>
-                    </MudChat>
+                    if (message.user == UserInput)
+                    {
+                        <MudChat Color="Color.Info" ChatPosition="ChatBubblePosition.End">
+                            <MudChatHeader Name="@message.user" />
+                            <MudChatBubble>@message.message</MudChatBubble>
+                        </MudChat>
+                    }
+                    else
+                    {
+                        <MudChat Color="Color.Secondary" ChatPosition="ChatBubblePosition.Start">
+                            <MudChatHeader Name="@message.user" />
+                            <MudChatBubble>@message.message</MudChatBubble>
+                        </MudChat>
+                    }
                 }
             }
         </MudPaper>
@@ -59,13 +65,14 @@ else
     public async Task ConnectToHub()
     {
         _hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/chatHub")).Build();
-
-        _hubConnection.On<string, string>("ReceiveMessage", (puser, pmessage) =>
+        
+        _hubConnection.On<string, string, bool>("ReceiveMessage", (puser, pmessage, system) =>
         {
             Message message = new Message()
             {
                 user = puser,
-                message = pmessage
+                message = pmessage,
+                systemMessage = system
             };
             messages.Add(message);
             
@@ -76,6 +83,12 @@ else
         });
 
         await _hubConnection.StartAsync();
+        
+        await _hubConnection.SendAsync("SendMessage", UserInput, UserInput + " has joined the chat!", true);
+
+        Snackbar.Clear();
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
+        Snackbar.Add("Successfully connected to chat", Severity.Success);
     }
 
     async Task Send()
@@ -86,7 +99,7 @@ else
         MessageInput = string.Empty; // Clear input before sending
         StateHasChanged(); // Ensure UI updates before sending the message
 
-        await _hubConnection.SendAsync("SendMessage", UserInput, tempMessage);
+        await _hubConnection.SendAsync("SendMessage", UserInput, tempMessage, false);
     }
 
     private async Task Enter(KeyboardEventArgs e)
@@ -110,6 +123,7 @@ else
     {
         public string user;
         public string message;
+        public bool systemMessage;
     }
 
 }
