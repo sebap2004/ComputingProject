@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ComputingProject.Client.Services;
 
-public class ChatHubClientService : IChatHubClient  
+public class ChatHubClientService : IChatHubClient, IChatService
 {
     private readonly HubConnection _hubConnection;
-    public bool IsConnected => _hubConnection.State == HubConnectionState.Connected;
+    public bool IsConnected() => _hubConnection.State == HubConnectionState.Connected;
 
     public event Action<string, string, bool>? OnMessageReceived;
 
@@ -39,9 +39,10 @@ public class ChatHubClientService : IChatHubClient
         await _hubConnection.StopAsync();
     }
 
-    public async Task ReceiveMessage(string sender, string content, bool systemMessage)
+    public Task ReceiveMessage(string sender, string content, bool systemMessage)
     {
         OnMessageReceived?.Invoke(sender, content, systemMessage);
+        return Task.CompletedTask;
     }
 }
 

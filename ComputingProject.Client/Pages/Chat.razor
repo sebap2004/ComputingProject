@@ -5,10 +5,10 @@
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveWebAssembly
 @inject ISnackbar Snackbar
-@inject ChatHubClientService ChatService
-@inject ChatHubServerProxy ChatServer
+@inject IChatService ChatService
+@inject IChatHubServer ChatServer
 
-@if (ChatService.IsConnected)
+@if (ChatService.IsConnected())
 {
     <div class="d-flex flex-column flex-grow-1 gap-4" style="height: 84vh">
         <MudPaper MinHeight="95%" Class="overflow-auto" id="chatscroll">
@@ -86,9 +86,9 @@ else
             await ChatService.StartAsync();
     
             // Wait for the connection to be fully established
-            while (!ChatService.IsConnected)
+            while (!ChatService.IsConnected())
             {
-                Console.WriteLine(ChatService.IsConnected);
+                Console.WriteLine(ChatService.IsConnected());
                 await Task.Delay(100);  // Short delay to prevent tight loop
                 Console.WriteLine();
             }

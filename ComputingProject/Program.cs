@@ -27,6 +27,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<IChatService, MockChatService>();
+builder.Services.AddScoped<IChatHubServer, MockChatHubServer>();
 
 var app = builder.Build();
 

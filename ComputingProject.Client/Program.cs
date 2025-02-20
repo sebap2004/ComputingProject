@@ -17,10 +17,8 @@ builder.Services.AddSingleton(sp =>
         .WithUrl(navigation.ToAbsoluteUri("/chatHub"))
         .Build();
 });
-
-
-builder.Services.AddScoped<ChatHubClientService>();
-builder.Services.AddScoped<ChatHubServerProxy>();
+builder.Services.AddScoped<IChatService, ChatHubClientService>();
+builder.Services.AddScoped<IChatHubServer, ChatHubServerProxy>();
 
 
 await builder.Build().RunAsync();
