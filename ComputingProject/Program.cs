@@ -3,6 +3,7 @@ using ComputingProject.Client.Pages;
 using ComputingProject.Client.Services;
 using ComputingProject.Components;
 using ComputingProject.Hubs;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -10,16 +11,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
-
 builder.Services.AddSignalR();
-
-
-
 
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "auth_token";
+        options.LoginPath = "/login";
+        options.Cookie.MaxAge = TimeSpan.FromDays(365);
+        options.AccessDeniedPath = "/access-denied";
+    });
+builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
 
 var app = builder.Build();
 
@@ -39,6 +46,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles(); 
 app.UseRouting();  
 app.UseAntiforgery();
+app.UseAuthentication();
+app.UseAuthorization();
+
 
 app.MapHub<ChatHub>("/chatHub"); 
 

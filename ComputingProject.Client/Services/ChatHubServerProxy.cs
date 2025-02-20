@@ -8,7 +8,7 @@ public class ChatHubServerProxy : IChatHubServer
     
     public ChatHubServerProxy(HubConnection hubConnection)
     {
-        Console.WriteLine("Added ChatHubCl+ientService");
+        Console.WriteLine("Added ChatHubClientService");
         _hubConnection = hubConnection;
     }
 

@@ -97,8 +97,8 @@ else
             Console.WriteLine(ChatService);
     
             Snackbar.Clear();
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
-            Snackbar.Add("Successfully connected to chat", Severity.Success);
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopLeft;
+            Snackbar.Add("Successfully connected to chat as " + UserInput, Severity.Success);
 
             await InvokeAsync(StateHasChanged);
     
