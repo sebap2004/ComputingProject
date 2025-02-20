@@ -5,10 +5,10 @@
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveWebAssembly
 @inject ISnackbar Snackbar
-@inject IChatService ChatService
-@inject IChatHubServer ChatServer
+@inject IClassroomService ClassroomService
+@inject IClassroomServer ChatServer
 
-@if (ChatService.IsConnected())
+@if (ClassroomService.IsConnected())
 {
     <div class="d-flex flex-column flex-grow-1 gap-4" style="height: 84vh">
         <MudPaper MinHeight="95%" Class="overflow-auto" id="chatscroll">
@@ -66,7 +66,7 @@ else
 
     public async Task ConnectToHub()
     {
-        ChatService.OnMessageReceived += (puser, pmessage, system) =>
+        ClassroomService.OnMessageReceived += (puser, pmessage, system) =>
         {
             Message message = new Message()
             {
@@ -83,18 +83,18 @@ else
         
         try 
         {
-            await ChatService.StartAsync();
+            await ClassroomService.StartAsync();
     
             // Wait for the connection to be fully established
-            while (!ChatService.IsConnected())
+            while (!ClassroomService.IsConnected())
             {
-                Console.WriteLine(ChatService.IsConnected());
+                Console.WriteLine(ClassroomService.IsConnected());
                 await Task.Delay(100);  // Short delay to prevent tight loop
                 Console.WriteLine();
             }
 
             Console.WriteLine(ChatServer);
-            Console.WriteLine(ChatService);
+            Console.WriteLine(ClassroomService);
     
             Snackbar.Clear();
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopLeft;

@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ComputingProject.Client.Services;
 
-public class ChatHubClientService : IChatHubClient, IChatService
+public class ClassroomClientService : IClassroomClient, IClassroomService
 {
     private readonly HubConnection _hubConnection;
     public bool IsConnected() => _hubConnection.State == HubConnectionState.Connected;
 
     public event Action<string, string, bool>? OnMessageReceived;
 
-    public ChatHubClientService(HubConnection hubConnection)
+    public ClassroomClientService(HubConnection hubConnection)
     {
         Console.WriteLine("Added ChatHubClientService");
         _hubConnection = hubConnection;

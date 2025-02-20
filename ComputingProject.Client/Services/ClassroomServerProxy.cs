@@ -2,11 +2,11 @@
 
 namespace ComputingProject.Client.Services;
 
-public class ChatHubServerProxy : IChatHubServer
+public class ClassroomServerProxy : IClassroomServer
 {
     private readonly HubConnection _hubConnection;
     
-    public ChatHubServerProxy(HubConnection hubConnection)
+    public ClassroomServerProxy(HubConnection hubConnection)
     {
         Console.WriteLine("Added ChatHubClientService");
         _hubConnection = hubConnection;

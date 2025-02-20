@@ -27,8 +27,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<IChatService, MockChatService>();
-builder.Services.AddScoped<IChatHubServer, MockChatHubServer>();
+builder.Services.AddScoped<IClassroomService, MockClassroomService>();
+builder.Services.AddScoped<IClassroomServer, MockClassroomServer>();
 
 var app = builder.Build();
 
@@ -52,7 +52,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-app.MapHub<ChatHub>("/chatHub"); 
+app.MapHub<Classroom>("/chatHub"); 
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

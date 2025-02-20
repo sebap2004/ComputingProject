@@ -2,7 +2,7 @@
 
 namespace ComputingProject.Hubs;
 
-public class MockChatService : IChatService
+public class MockClassroomService : IClassroomService
 {
     public event Action<string, string, bool>? OnMessageReceived;
     public Task StartAsync() => Task.CompletedTask;

@@ -5,10 +5,17 @@ namespace ComputingProject.Client.Pages;
 
 public partial class Home
 {
-    private Task OpenDialogAsync()
+    private Task OpenStudentDialog()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
 
-        return DialogService.ShowAsync<StudentLogin>("Simple Dialog", options);
+        return DialogService.ShowAsync<StudentLoginDialog>("Simple Dialog", options);
+    }
+    
+    private Task OpenTeacherDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        return DialogService.ShowAsync<TeacherLoginDialog>("Simple Dialog", options);
     }
 }

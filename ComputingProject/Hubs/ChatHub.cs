@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace ComputingProject.Hubs;
 
 
-public class ChatHub : Hub<IChatHubClient>, IChatHubServer
+public class Classroom : Hub<IClassroomClient>, IClassroomServer
 {
     public async Task SendMessage(string sender, string content, bool systemMessage)
     {

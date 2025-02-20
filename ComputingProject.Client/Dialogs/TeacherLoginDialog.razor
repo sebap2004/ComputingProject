@@ -1,0 +1,49 @@
+﻿@using System.ComponentModel.DataAnnotations
+<MudDialog OnBackdropClick="_ => { }">
+    <TitleContent>
+        <MudText Typo="Typo.h5">TEACHER LOGIN</MudText>
+        <MudText>Enter Details Provided To you</MudText>
+    </TitleContent>
+    <DialogContent >
+        <EditForm Model="@formModel" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator/>
+            <MudCard Elevation="0" Style="width: 30rem" >
+                <MudCardContent Class="pt-0">
+                    <MudTextField Label="Password" HelperText="Ask the project leader if you've forgotten" Class="mt-3"
+                                  @bind-Value="formModel.Password" For="@(() => formModel.Password)" InputType="InputType.Password"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudSpacer />
+                    <MudButton OnClick="Cancel">Cancel</MudButton>
+                    <MudButton Disabled="success" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Ok</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    StudentLoginForm formModel = new StudentLoginForm();
+    bool success;
+    
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    
+    private void Cancel() => MudDialog.Cancel();
+    
+    public class StudentLoginForm
+    {
+        [Required]
+        [StringLength(2, ErrorMessage = "ID length can't be more than 2.")]
+        public string Username { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+    }
+    
+    private void OnValidSubmit(EditContext context)
+    {
+        success = true;
+        MudDialog.Close(DialogResult.Ok(true));
+        StateHasChanged();
+    }
+}

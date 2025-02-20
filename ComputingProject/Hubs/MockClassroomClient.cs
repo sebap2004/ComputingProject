@@ -2,7 +2,7 @@
 
 namespace ComputingProject.Hubs;
 
-public class MockChatHubClient : IChatHubClient
+public class MockClassroomClient : IClassroomClient
 {
     public bool IsConnected() => false;
 
