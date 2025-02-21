@@ -28,5 +28,6 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
     {
         ClassroomStateService.classroomState = stateToChangeTo;
         await Clients.All.GetClassroomState(ClassroomStateService.classroomState);
+        await Clients.All.ReceiveMessage("", "Set the classroom state to " + stateToChangeTo, true);
     }
 }
