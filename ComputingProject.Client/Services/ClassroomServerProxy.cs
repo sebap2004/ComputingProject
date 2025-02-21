@@ -16,4 +16,15 @@ public class ClassroomServerProxy : IClassroomServer
     {
         await _hubConnection.InvokeAsync("SendMessage", sender, content, systemMessage);
     }
+
+    public async Task GetClassroomState()
+    {
+        await _hubConnection.InvokeAsync("GetClassroomState");
+        Console.WriteLine("Invoked GetClassroomState");
+    }
+
+    public async Task SetClassroomState(ClassroomState stateToChangeTo)
+    {
+        await _hubConnection.InvokeAsync("SetClassroomState", stateToChangeTo);
+    }
 }

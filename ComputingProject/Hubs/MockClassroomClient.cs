@@ -10,4 +10,8 @@ public class MockClassroomClient : IClassroomClient
     public Task StartAsync() => Task.CompletedTask;
     public Task StopAsync() => Task.CompletedTask;
     public Task ReceiveMessage(string sender, string content, bool systemMessage) => Task.CompletedTask;
+    public Task GetClassroomState(ClassroomState classroomState)
+    {
+        return Task.CompletedTask;
+    }
 }

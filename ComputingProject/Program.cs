@@ -3,8 +3,10 @@ using ComputingProject.Client.Pages;
 using ComputingProject.Client.Services;
 using ComputingProject.Components;
 using ComputingProject.Hubs;
+using ComputingProject.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,8 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add MudBlazor services
 builder.Services.AddMudServices();
 builder.Services.AddSignalR();
-
-
+builder.Services.AddScoped(sp => new HttpClient 
+{ 
+});
+builder.Services.AddControllers();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
@@ -21,7 +25,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.Cookie.Name = "auth_token";
-        options.LoginPath = "/login";
+        options.LoginPath = "/api/auth/login";
         options.Cookie.MaxAge = TimeSpan.FromDays(365);
         options.AccessDeniedPath = "/access-denied";
     });
@@ -29,6 +33,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IClassroomService, MockClassroomService>();
 builder.Services.AddScoped<IClassroomServer, MockClassroomServer>();
+builder.Services.AddSingleton<ClassroomStateService>();
 
 var app = builder.Build();
 
@@ -53,6 +58,8 @@ app.UseAuthorization();
 
 
 app.MapHub<Classroom>("/chatHub"); 
+
+app.MapControllers();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

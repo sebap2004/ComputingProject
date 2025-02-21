@@ -1,12 +1,15 @@
-﻿@page "/chat"
+﻿@page "/teacher"
+@using System.Security.Claims
 @using ComputingProject.Client.Services
 @using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveWebAssembly
 @inject ISnackbar Snackbar
 @inject IClassroomService ClassroomService
-@inject IClassroomServer ChatServer
+@inject IClassroomServer ClassroomServer
 
 @if (ClassroomService.IsConnected())
 {
@@ -20,7 +23,7 @@
                 }
                 else
                 {
-                    if (message.user == UserInput)
+                    if (message.user == UserName)
                     {
                         <MudChat Color="Color.Info" ChatPosition="ChatBubblePosition.End">
                             <MudChatHeader Name="@message.user" />
@@ -39,11 +42,17 @@
         </MudPaper>
         <MudPaper Height="10%" Class="h-10">
             <div class="d-flex flex-grow-1 gap-4">
-                <MudPaper Width="89%">
+                <MudPaper Width="60%">
                     <MudTextField @bind-Value="MessageInput" Immediate="true" Variant="Variant.Outlined" @onkeydown="@Enter" Label="Message"/>
                 </MudPaper>
                 <MudPaper Width="10%" Class="d-flex justify-center">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="Send">Send Message</MudButton>
+                </MudPaper>
+                <MudPaper Width="10%" Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="SetSeminarState">Set To Seminar</MudButton>
+                </MudPaper>
+                <MudPaper Width="10%" Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="SetLectureState">Set To Lecture</MudButton>
                 </MudPaper>
             </div>
         </MudPaper>
@@ -51,18 +60,37 @@
 }
 else
 {
-    <MudText Typo="Typo.h2">Welcome to freaking awesome chat</MudText>
-    <MudPaper Class="d-flex flex-grow-1 gap-4 flex-column">
-        <MudTextField Margin="Margin.Normal" Class="flex" @bind-Value="UserInput" Variant="Variant.Outlined" Label="Name"/>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ConnectToHub">Connect to Chat server</MudButton>
-    </MudPaper>
+    <MudText Typo="Typo.h2">Connecting...</MudText>
+    <CascadingAuthenticationState>
+        <AuthorizeView>
+            <Authorized>
+                <MudText>You are logged in as @context.User.Identity.Name</MudText>
+            </Authorized>
+            <NotAuthorized>
+                <MudText>You are not logged in. <a href="/teacher-login">Login</a></MudText>
+            </NotAuthorized>
+        </AuthorizeView>
+    </CascadingAuthenticationState>
 }
 
 @code {
-    
+    ClassroomState currentState;
     private List<Message> messages = new List<Message>();
-    private string UserInput { get; set; }
+    private string UserName { get; set; }
+    private string UserRole { get; set; }
     private string MessageInput;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            UserName = user.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
+            UserRole = user.FindFirst(ClaimTypes.Role)?.Value ?? "No role";
+        }
+        _ = ConnectToHub();
+    }
 
     public async Task ConnectToHub()
     {
@@ -80,6 +108,14 @@ else
             
             JSRuntime.InvokeVoidAsync("scrollToBottom", "chatscroll");
         };
+
+        ClassroomService.OnJoinGetState += state =>
+        {
+            currentState = state;
+            Snackbar.Add("HOly shit received the state: " + state, currentState == ClassroomState.Lecture ? Severity.Success : Severity.Warning);
+        };
+
+        Console.WriteLine("Registered events");
         
         try 
         {
@@ -88,21 +124,22 @@ else
             // Wait for the connection to be fully established
             while (!ClassroomService.IsConnected())
             {
-                Console.WriteLine(ClassroomService.IsConnected());
-                await Task.Delay(100);  // Short delay to prevent tight loop
-                Console.WriteLine();
+                await Task.Delay(100);
+                // Short delay to prevent tight loop
             }
 
-            Console.WriteLine(ChatServer);
+            Console.WriteLine(ClassroomServer);
             Console.WriteLine(ClassroomService);
     
             Snackbar.Clear();
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopLeft;
-            Snackbar.Add("Successfully connected to chat as " + UserInput, Severity.Success);
+            Snackbar.Add("Successfully connected to chat as " + UserName, Severity.Success);
 
             await InvokeAsync(StateHasChanged);
     
-            await ChatServer.SendMessage(UserInput, UserInput + " has joined the chat!", true);
+            await ClassroomServer.SendMessage(UserName, UserName + " has joined the chat!", true);
+            await ClassroomServer.GetClassroomState();
+            Console.WriteLine("Called get classroom state");
         }
         catch (Exception ex)
         {
@@ -119,7 +156,7 @@ else
         MessageInput = string.Empty; // Clear input before sending
         StateHasChanged(); // Ensure UI updates before sending the message
 
-        await ChatServer.SendMessage(UserInput, tempMessage, false);
+        await ClassroomServer.SendMessage(UserName, tempMessage, false);
     }
 
     private async Task Enter(KeyboardEventArgs e)
@@ -128,6 +165,16 @@ else
         {
             await Send();
         }
+    }
+    
+    public async Task SetSeminarState()
+    {
+        await ClassroomServer.SetClassroomState(ClassroomState.Seminar);
+    }
+    
+    public async Task SetLectureState()
+    {
+        await ClassroomServer.SetClassroomState(ClassroomState.Lecture);
     }
 
     public struct Message

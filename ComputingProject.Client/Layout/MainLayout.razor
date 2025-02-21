@@ -1,4 +1,9 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
 <script>
     function scrollToBottom(elementId) {
         var element = document.getElementById(elementId);
@@ -14,7 +19,18 @@
 <MudLayout>
     <MudAppBar Elevation="1">
         <MudText Typo="Typo.h5" Class="ml-3 mr-3">HeadsUp</MudText>
-        <MudButton Href="/chat" Variant="Variant.Filled" Color="Color.Primary">Chat</MudButton>
+        <CascadingAuthenticationState>
+            <AuthorizeView>
+                <Authorized>
+                    <MudButton OnClick="LogOut" Class="mr-3" Variant="Variant.Filled" Color="Color.Secondary">Log Out</MudButton>
+                    <p>Login Status: @context.User.Identity.IsAuthenticated - Name: @context.User.FindFirst(ClaimTypes.Name)?.Value - Role: @context.User.FindFirst(ClaimTypes.Role)?.Value</p>
+                </Authorized>
+                <NotAuthorized>
+                    <p>Login Status: @context.User.Identity.IsAuthenticated</p>
+                </NotAuthorized>
+            </AuthorizeView>
+        </CascadingAuthenticationState>
+        
         <MudSpacer/>
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
         <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
@@ -36,10 +52,26 @@
     private bool _isDarkMode = true;
     private MudTheme? _theme = null;
 
+    public async Task LogOut()
+    {
+        var response = await HttpClient.PostAsync("api/auth/logout", null);
+        if (response.IsSuccessStatusCode)
+        {
+            if (AuthStateProvider is CookieAuthenticationStateProvider customProvider)
+            {
+                customProvider.NotifyAuthenticationStateChanged();
+                Navigation.NavigateTo("/");
+            }
+        }
+        else
+        {
+        }
+    }
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
+        
         _theme = new()
         {
             PaletteLight = _lightPalette,

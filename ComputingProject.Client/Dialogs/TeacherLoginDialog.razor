@@ -1,16 +1,20 @@
-﻿@using System.ComponentModel.DataAnnotations
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
 <MudDialog OnBackdropClick="_ => { }">
     <TitleContent>
         <MudText Typo="Typo.h5">TEACHER LOGIN</MudText>
         <MudText>Enter Details Provided To you</MudText>
     </TitleContent>
     <DialogContent >
-        <EditForm Model="@formModel" OnValidSubmit="OnValidSubmit">
+        <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
             <DataAnnotationsValidator/>
             <MudCard Elevation="0" Style="width: 30rem" >
                 <MudCardContent Class="pt-0">
                     <MudTextField Label="Password" HelperText="Ask the project leader if you've forgotten" Class="mt-3"
-                                  @bind-Value="formModel.Password" For="@(() => formModel.Password)" InputType="InputType.Password"/>
+                                  @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" InputType="InputType.Password"/>
                 </MudCardContent>
                 <MudCardActions>
                     <MudSpacer />
@@ -23,27 +27,28 @@
 </MudDialog>
 
 @code {
-    StudentLoginForm formModel = new StudentLoginForm();
+    private LoginModel loginModel = new();
     bool success;
     
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
     
     private void Cancel() => MudDialog.Cancel();
     
-    public class StudentLoginForm
+    private async Task HandleLogin()
     {
-        [Required]
-        [StringLength(2, ErrorMessage = "ID length can't be more than 2.")]
-        public string Username { get; set; }
-
-        [Required]
-        public string Password { get; set; }
-    }
-    
-    private void OnValidSubmit(EditContext context)
-    {
-        success = true;
-        MudDialog.Close(DialogResult.Ok(true));
-        StateHasChanged();
+        loginModel.IsTeacher = true;
+        loginModel.Username = "Teacher";
+        var response = await HttpClient.PostAsJsonAsync("api/auth/login", loginModel);
+        if (response.IsSuccessStatusCode)
+        {
+            if (AuthStateProvider is CookieAuthenticationStateProvider customProvider)
+            {
+                customProvider.NotifyAuthenticationStateChanged();
+                Navigation.NavigateTo("/teacher");
+            }
+        }
+        else
+        {
+        }
     }
 }
