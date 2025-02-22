@@ -1,5 +1,4 @@
-﻿@page "/teacher"
-@using System.Security.Claims
+﻿@using System.Security.Claims
 @using ComputingProject.Client.Services
 @using Microsoft.AspNetCore.SignalR.Client
 @using Microsoft.AspNetCore.Components.Authorization
@@ -134,11 +133,8 @@ else
             Snackbar.Clear();
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopLeft;
             Snackbar.Add("Successfully connected to chat as " + UserName, Severity.Success);
-
             await InvokeAsync(StateHasChanged);
-    
-            await ClassroomServer.SendMessage(UserName, UserName + " has joined the chat!", true);
-            await ClassroomServer.GetClassroomState();
+            await ClassroomServer.GetClassroomState(UserName);
             Console.WriteLine("Called get classroom state");
         }
         catch (Exception ex)

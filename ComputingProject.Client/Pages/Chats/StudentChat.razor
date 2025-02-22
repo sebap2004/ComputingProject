@@ -1,5 +1,4 @@
-﻿@page "/student"
-@using System.Security.Claims
+﻿@using System.Security.Claims
 @using ComputingProject.Client.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager NavigationManager
@@ -48,6 +47,7 @@
                         </MudPaper>
                         <MudPaper Width="10%" Class="d-flex justify-center">
                             <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="Send">Send Message</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="SendToTeacher">Send To Teacher Only</MudButton>
                         </MudPaper>
                     </div>
                 </MudPaper>
@@ -73,6 +73,15 @@
     private string UserRole { get; set; }
     private string MessageInput;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("preventClose");
+        }
+    }
+    
+    
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -145,6 +154,17 @@
         StateHasChanged(); // Ensure UI updates before sending the message
 
         await ClassroomServer.SendMessage(UserName, tempMessage, false);
+    }
+    
+    async Task SendToTeacher()
+    {
+        if (string.IsNullOrWhiteSpace(MessageInput)) return;
+    
+        var tempMessage = MessageInput;
+        MessageInput = string.Empty; // Clear input before sending
+        StateHasChanged(); // Ensure UI updates before sending the message
+
+        await ClassroomServer.SendMessageToTeacher(UserName, tempMessage, false);
     }
 
     private async Task Enter(KeyboardEventArgs e)

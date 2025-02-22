@@ -1,0 +1,48 @@
+﻿@page "/teacher"
+@using ComputingProject.Client.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@using ComputingProject.Client.Components
+@rendermode InteractiveWebAssembly
+@inject ISnackbar Snackbar
+@inject IClassroomService ClassroomService
+@inject IClassroomServer ClassroomServer
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<MudText Align="Align.Center" Typo="Typo.h3"><b>Teacher View</b></MudText>
+
+<br/>
+
+<MudGrid>
+    <TeacherGridItem>
+        <MudText Typo="Typo.h4"><b >Manage Classroom State</b></MudText>
+        <MudText GutterBottom="true" Typo="Typo.body1">Current state: @currentState</MudText>
+        <MudText GutterBottom="true" Typo="Typo.body1">Joined Students: @StudentCount</MudText>
+        <MudPaper Elevation="0">
+            <MudButton Class="mr-3" Variant="Variant.Filled" Color="Color.Primary" OnClick="SetLectureState">Switch To Lecture Mode</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="SetSeminarState">Switch To Seminar Mode</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="ClassroomServer.GetStudents">Refresh Student List</MudButton>
+        </MudPaper>
+        <MudText Class="mt-3">Joined Students:</MudText>
+        <MudPaper Class="is-overflow-auto" Elevation="0">
+            <MudPaper>
+                <ul>
+                    @foreach (string student in JoinedStudents)
+                    {
+                        <li>@student</li>
+                    }
+                </ul>
+            </MudPaper>
+        </MudPaper>
+    </TeacherGridItem>
+    <TeacherGridItem>
+        Hello my stupid crackers
+    </TeacherGridItem>
+    <TeacherGridItem>
+        Hello my stupid crackers
+    </TeacherGridItem>
+    <TeacherGridItem>
+        Hello my stupid crackers
+    </TeacherGridItem>
+</MudGrid>
+

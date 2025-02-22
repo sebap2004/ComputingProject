@@ -1,0 +1,12 @@
+﻿@page "/student"
+@using ComputingProject.Client.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@using ComputingProject.Client.Components
+@rendermode InteractiveWebAssembly
+@inject ISnackbar Snackbar
+@inject IClassroomService ClassroomService
+@inject IClassroomServer ClassroomServer
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h3>StudentView</h3>

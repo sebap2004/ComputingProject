@@ -1,17 +1,11 @@
 ﻿@using System.Security.Claims
+@using ComputingProject.Client.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
-<script>
-    function scrollToBottom(elementId) {
-        var element = document.getElementById(elementId);
-        if (element) {
-            element.scrollTop = element.scrollHeight;
-        }
-    }
-</script>
+@inject IClassroomService ClassroomService
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"/>
 <MudPopoverProvider/>
 <MudDialogProvider/>
@@ -61,6 +55,7 @@
             {
                 customProvider.NotifyAuthenticationStateChanged();
                 Navigation.NavigateTo("/");
+                await ClassroomService.StopAsync();
             }
         }
         else

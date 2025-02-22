@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ComputingProject.Client.Services;
@@ -10,22 +11,20 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
 
     public event Action<string, string, bool>? OnMessageReceived;
     public event Action<ClassroomState>? OnJoinGetState;
+    public event Action<ClassroomState>? GetState;
+    public event Action<List<String>>? OnStudentJoinedMessage;
+    public event Action<List<String>>? OnStudentLeftMessage;
+    public event Action<List<string>>? OnReceiveStudentList;
 
-    
 
     public ClassroomClientService(HubConnection hubConnection)
     {
-        Console.WriteLine("Added ChatHubClientService");
         _hubConnection = hubConnection;
-        // Receiving Chat Message
-        _hubConnection.On<string, string, bool>("ReceiveMessage", (user, message, systemMessage) =>
-        {
-            OnMessageReceived?.Invoke(user, message, systemMessage);
-        });
-        _hubConnection.On<ClassroomState>("GetClassroomState", (state) =>
-        {
-            OnJoinGetState?.Invoke(state);
-        });
+        _hubConnection.On<string, string, bool>("ReceiveMessage", ReceiveMessage);
+        _hubConnection.On<ClassroomState>("GetClassroomState", GetClassroomState);
+        _hubConnection.On<List<String>>("SendStudentJoinedMessage", SendStudentJoinedMessage);
+        _hubConnection.On<List<String>>("SendStudentLeftMessage", SendStudentLeftMessage);
+        _hubConnection.On<List<String>>("GetStudents", GetStudents);
     }
 
     public async Task StartAsync()
@@ -55,8 +54,27 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
 
     public Task GetClassroomState(ClassroomState classroomState)
     {
-        OnJoinGetState?.Invoke(classroomState);
+        GetState?.Invoke(classroomState);
         Console.WriteLine("Invoked message");
+        return Task.CompletedTask;
+    }
+
+    public Task GetStudents(List<string> students)
+    {
+        Console.WriteLine("Received Students");
+        OnReceiveStudentList?.Invoke(students);
+        return Task.CompletedTask;
+    }
+
+    public Task SendStudentJoinedMessage(List<String> Users)
+    {
+        OnStudentJoinedMessage?.Invoke(Users);
+        return Task.CompletedTask;
+    }
+
+    public Task SendStudentLeftMessage(List<String> Users)
+    {
+        OnStudentLeftMessage?.Invoke(Users);
         return Task.CompletedTask;
     }
 }

@@ -19,6 +19,7 @@ public class AuthController : ControllerBase
                 var claims = new List<Claim>
                 {
                     new(ClaimTypes.Name, model.Username),
+                    new(ClaimTypes.NameIdentifier, model.Username),
                     new(ClaimTypes.Role, "Teacher")
                 };
 
@@ -39,6 +40,7 @@ public class AuthController : ControllerBase
                 var claims = new List<Claim>
                 {
                     new(ClaimTypes.Name, model.Username),
+                    new(ClaimTypes.NameIdentifier, model.Username),
                     new(ClaimTypes.Role, "Student")
                 };
                 var identity = new ClaimsIdentity(claims, "Cookies");

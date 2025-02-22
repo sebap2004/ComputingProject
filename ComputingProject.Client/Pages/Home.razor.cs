@@ -7,8 +7,8 @@ namespace ComputingProject.Client.Pages;
 
 public partial class Home
 {
-    private string UserName {get; set;}
-    private string UserRole {get; set;}
+    private string? UserName {get; set;}
+    private string? UserRole {get; set;}
     
     private bool IsAuthenticated {get; set;}
     

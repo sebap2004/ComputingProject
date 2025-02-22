@@ -20,7 +20,7 @@
                 <MudCardActions>
                     <MudSpacer />
                     <MudButton OnClick="Cancel">Cancel</MudButton>
-                    <MudButton Disabled="success" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Ok</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Ok</MudButton>
                 </MudCardActions>
             </MudCard>
         </EditForm>
@@ -29,7 +29,6 @@
 
 @code {
     private LoginModel loginModel = new();
-    bool success;
     
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
     
