@@ -132,7 +132,7 @@
     
             Snackbar.Clear();
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopLeft;
-            Snackbar.Add("Successfully connected to chat as " + UserName, Severity.Success);
+            Snackbar.Add("Successfully connected to Classroom as " + UserName, Severity.Success);
 
             await InvokeAsync(StateHasChanged);
     
@@ -141,7 +141,7 @@
         catch (Exception ex)
         {
             // Handle connection errors
-            Snackbar.Add("Failed to connect to chat: " + ex.Message, Severity.Error);
+            Snackbar.Add("Failed to connect to Classroom: " + ex.Message, Severity.Error);
         }
     }
 

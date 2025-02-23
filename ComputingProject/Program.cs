@@ -57,7 +57,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-app.MapHub<Classroom>("/chatHub"); 
+app.MapHub<Classroom>("/classroomhub"); 
 
 app.MapControllers();
 

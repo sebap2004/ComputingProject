@@ -31,13 +31,13 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
     {
         try
         {
-            Console.WriteLine("Starting chat hub connection...");
+            Console.WriteLine("Starting classroom hub connection...");
             await _hubConnection.StartAsync();
-            Console.WriteLine("Chat hub connection started successfully. Current state: " + _hubConnection.State);
+            Console.WriteLine("classroom hub connection started successfully. Current state: " + _hubConnection.State);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error starting chat hub connection: {ex.Message}");
+            Console.WriteLine($"Error starting classroom hub connection: {ex.Message}");
         }
     }
 

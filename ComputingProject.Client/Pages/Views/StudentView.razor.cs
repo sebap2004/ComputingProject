@@ -65,16 +65,16 @@ public partial class StudentView : ComponentBase
     
             Snackbar.Clear();
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopLeft;
-            Snackbar.Add("Successfully connected to chat as " + UserName, Severity.Success);
+            Snackbar.Add("Successfully connected to classroom as " + UserName, Severity.Success);
 
             await InvokeAsync(StateHasChanged);
     
-            await ClassroomServer.SendMessage(UserName, UserName + " has joined the chat!", true);
+            await ClassroomServer.SendMessage(UserName, UserName + " has joined the classroom!", true);
         }
         catch (Exception ex)
         {
             // Handle connection errors
-            Snackbar.Add("Failed to connect to chat: " + ex.Message, Severity.Error);
+            Snackbar.Add("Failed to connect to classroom: " + ex.Message, Severity.Error);
         }
     }
 

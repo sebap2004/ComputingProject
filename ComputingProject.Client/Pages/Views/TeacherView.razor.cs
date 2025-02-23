@@ -9,11 +9,15 @@ namespace ComputingProject.Client.Pages.Views;
 
 public partial class TeacherView : ComponentBase
 {
+    private MudTheme Theme = new MudTheme();
     ClassroomState currentState;
     private List<Message> messages = new List<Message>();
     private string UserName { get; set; }
     private string UserRole { get; set; }
     private string MessageInput;
+    
+    private Color SeminarButtonColor => currentState == ClassroomState.Seminar ? Color.Primary : Color.Secondary;
+    private Color LectureButtonColor => currentState == ClassroomState.Lecture ? Color.Primary : Color.Secondary;
     
     public List<string> JoinedStudents { get; set; } = new List<string>();
     public int StudentCount => JoinedStudents.Count;
@@ -69,8 +73,7 @@ public partial class TeacherView : ComponentBase
         ClassroomService.OnReceiveStudentList += (connectionList) =>
         {
             JoinedStudents = connectionList;
-            Console.WriteLine("Received Student List On Page");
-            Console.WriteLine("Student list size: " + connectionList.Count);
+            Snackbar.Add("Student List Updated", Severity.Info);
             StateHasChanged();
         };
         try 
@@ -81,7 +84,6 @@ public partial class TeacherView : ComponentBase
                 await Task.Delay(100);
             }
             Snackbar.Clear();
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopLeft;
             Snackbar.Add("Joined Classroom Successfully", Severity.Success);
             await ClassroomServer.GetClassroomState(UserName);
             StateHasChanged();
@@ -91,7 +93,7 @@ public partial class TeacherView : ComponentBase
         catch (Exception ex)
         {
             // Handle connection errors
-            Snackbar.Add("Failed to connect to chat: " + ex.Message, Severity.Error);
+            Snackbar.Add("Failed to connect to classroom: " + ex.Message, Severity.Error);
         }
     }
 
@@ -100,8 +102,8 @@ public partial class TeacherView : ComponentBase
         if (string.IsNullOrWhiteSpace(MessageInput)) return;
     
         var tempMessage = MessageInput;
-        MessageInput = string.Empty; // Clear input before sending
-        StateHasChanged(); // Ensure UI updates before sending the message
+        MessageInput = string.Empty;
+        StateHasChanged();
 
         await ClassroomServer.SendMessage(UserName, tempMessage, false);
     }
@@ -116,11 +118,13 @@ public partial class TeacherView : ComponentBase
     
     public async Task SetSeminarState() 
     {
+        if (currentState == ClassroomState.Seminar) return;
         await ClassroomServer.SetClassroomState(ClassroomState.Seminar);
     }
     
     public async Task SetLectureState()
     {
+        if (currentState == ClassroomState.Lecture) return;
         await ClassroomServer.SetClassroomState(ClassroomState.Lecture);
     }
 

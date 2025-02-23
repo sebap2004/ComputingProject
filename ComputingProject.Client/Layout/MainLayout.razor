@@ -17,10 +17,10 @@
             <AuthorizeView>
                 <Authorized>
                     <MudButton OnClick="LogOut" Class="mr-3" Variant="Variant.Filled" Color="Color.Secondary">Log Out</MudButton>
-                    <p>Login Status: @context.User.Identity.IsAuthenticated - Name: @context.User.FindFirst(ClaimTypes.Name)?.Value - Role: @context.User.FindFirst(ClaimTypes.Role)?.Value</p>
+                    <p>Logged in - Name: @context.User.FindFirst(ClaimTypes.Name)?.Value - Role: @context.User.FindFirst(ClaimTypes.Role)?.Value</p>
                 </Authorized>
                 <NotAuthorized>
-                    <p>Login Status: @context.User.Identity.IsAuthenticated</p>
+                    <p>Not Logged In</p>
                 </NotAuthorized>
             </AuthorizeView>
         </CascadingAuthenticationState>
