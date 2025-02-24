@@ -30,7 +30,16 @@ public partial class TeacherView : ComponentBase
         {
             UserName = user.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
             UserRole = user.FindFirst(ClaimTypes.Role)?.Value ?? "No role";
+            Console.WriteLine("User role is " + UserRole);
+            if (UserRole != "Teacher")
+            {
+                NavigationManager.NavigateTo($"/access-denied/{Uri.EscapeDataString($"incorrectrole")}");
+            }
             _ = ConnectToHub();
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/access-denied/{Uri.EscapeDataString("notauthenticated")}");
         }
     }
 
@@ -76,7 +85,7 @@ public partial class TeacherView : ComponentBase
             Snackbar.Add("Student List Updated", Severity.Info);
             StateHasChanged();
         };
-        try 
+        try
         {
             await ClassroomService.StartAsync();
             while (!ClassroomService.IsConnected())

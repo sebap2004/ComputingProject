@@ -32,15 +32,18 @@
             </MudGrid>
         </MudPaper>
         <MudText Class="mt-3">Student List (@StudentCount joined):</MudText>
-        <MudPaper Style="@($"background:{Theme.PaletteDark.DarkDarken};")"  Height="12.5rem" MaxHeight="12.5rem" Class="is-overflow-y-scroll mb-2"  Elevation="0">
-            <MudPaper Elevation="0" Style="@($"background:{Color.Transparent};")">
-                <ul>
+        <MudPaper Style="@($"background:{Theme.PaletteDark.DarkDarken};")"  Height="20rem" MaxHeight="20rem" Class="is-overflow-y-auto mb-2"  Elevation="0">
+            <MudPaper Class="p-4" Elevation="0" Style="@($"background:{Color.Transparent};")">
+                <MudGrid Spacing="1">
                     @foreach (string student in JoinedStudents)
                     {
-                        <li>@student</li>
+                        <MudItem xs="12" sm="4">
+                            <MudPaper Class="p-2">
+                                <MudText>Student @student</MudText>
+                            </MudPaper>
+                        </MudItem>
                     }
-                    <li>Fake Student</li>
-                </ul>
+                </MudGrid>
             </MudPaper>
         </MudPaper>
         <MudButton Variant="Variant.Filled" FullWidth="false" Color="Color.Tertiary" OnClick="ClassroomServer.GetStudents">Refresh Student
@@ -48,13 +51,52 @@
         </MudButton>
     </TeacherGridItem>
     <TeacherGridItem>
-        Hello my stupid crackers
+        <MudText GutterBottom="true" Typo="Typo.h4"><b>Send Question</b></MudText>
+        <MudPaper Class="d-flex flex-row mb-3">
+            <MudTextField T="string" Placeholder="Ask your students a question" Label="Question" Variant="Variant.Filled" Typo="Typo.h5"></MudTextField>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-3">Send</MudButton>
+        </MudPaper>
+        <MudText GutterBottom="true" Typo="Typo.h5"><b>Manage Questions</b></MudText>
+        <MudPaper Style="@($"background:{Theme.PaletteDark.DarkDarken};")"  Height="20rem" MaxHeight="20rem" Class="is-overflow-y-auto mb-2"  Elevation="0">
+            <MudPaper Class="p-4" Elevation="0" Style="@($"background:{Color.Transparent};")">
+                <MudGrid Spacing="1">
+                    @foreach (string student in JoinedStudents)
+                    {
+                        <MudItem xs="12">
+                            <MudPaper Class="p-2 d-flex flex-row align-center">
+                                <MudText>Is pee stored in the balls?</MudText>
+                                <MudSpacer></MudSpacer>
+                                <MudButton Color="Color.Primary" Variant="Variant.Filled">See answers</MudButton>
+                            </MudPaper>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudPaper>
+        </MudPaper>
     </TeacherGridItem>
     <TeacherGridItem>
-        Hello my stupid crackers
+        <MudText GutterBottom="true" Typo="Typo.h4"><b>Manage Help Requests</b></MudText>
+        <MudText GutterBottom="true" Typo="Typo.h6">Current Active Help Requests</MudText>
+        <MudPaper Style="@($"background:{Theme.PaletteDark.DarkDarken};")"  Height="35rem" MaxHeight="35rem" Class="is-overflow-y-auto mb-2"  Elevation="0">
+            <MudPaper Class="p-4" Elevation="0" Style="@($"background:{Color.Transparent};")">
+                <MudGrid Spacing="1">
+                    @foreach (string student in JoinedStudents)
+                    {
+                        <MudItem xs="12">
+                            <MudPaper Class="p-2 d-flex flex-row align-center">
+                                <MudText>Student 1 needs help</MudText>
+                                <MudSpacer></MudSpacer>
+                                <MudButton Color="Color.Secondary" Variant="Variant.Filled">Acknowledge</MudButton>
+                                <MudButton Color="Color.Primary" Variant="Variant.Filled">Mark as resolved</MudButton>
+                            </MudPaper>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudPaper>
+        </MudPaper>
     </TeacherGridItem>
     <TeacherGridItem>
-        Hello my stupid crackers
+        
     </TeacherGridItem>
 </MudGrid>
 

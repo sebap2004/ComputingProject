@@ -25,7 +25,15 @@ public partial class StudentView : ComponentBase
         {
             UserName = user.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
             UserRole = user.FindFirst(ClaimTypes.Role)?.Value ?? "No role";
+            if (UserRole != "Student")
+            {
+                NavigationManager.NavigateTo($"/access-denied/{Uri.EscapeDataString($"incorrectrole")}");
+            }
             _ = ConnectToHub();
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/access-denied/{Uri.EscapeDataString("notauthenticated")}");
         }
     }
 

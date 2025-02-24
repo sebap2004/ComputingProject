@@ -5,18 +5,46 @@ namespace ComputingProject.Services;
 
 public class ClassroomStateService
 {
+    // Current classroom state enum
     public ClassroomState classroomState { get; set; }
-    public List<String> Users { get; set; } = new List<string>();
+    
+    // Current users connected to the hub
+    public List<string> ConnectedUsers { get; set; } = new();
+    
+    // Current active help requests. String is the student's username
+    public List<string> ActiveHelpRequests { get; set; } = new();
+    
+    // Current active questions in the session. Uses teacher object
+    public List<TeacherQuestion> ActiveQuestions { get; set; } = new ();
 
-    public void AddStudent(String user)
+    
+    // Adds a student to the student list. String is user ID
+    public void AddStudent(string user)
     {
-        Users.Add(user);
-        Console.WriteLine($"Added student {user}, new count {Users.Count}");
+        ConnectedUsers.Add(user);
     }
 
-    public void RemoveStudent(String user)
+    // Removes a student to the student list. String is user ID
+    public void RemoveStudent(string user)
     {
-        Users.Remove(user);
+        ConnectedUsers.Remove(user);
     }
 }
+
+// Teacher question object
+public class TeacherQuestion
+{
+    public TeacherQuestion(string question)
+    {
+        Question = question;
+        Answers = new();
+    }
+    
+    // Question text that the teacher asked
+    public string Question { get; set; }
+    
+    // Student's answers
+    public List<string> Answers { get; set; } 
+}
+
 

@@ -6,17 +6,18 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 @inject IClassroomService ClassroomService
+@inject ISnackbar Snackbar
+
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"/>
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudText Typo="Typo.h5" Class="ml-3 mr-3">HeadsUp</MudText>
+        <MudLink Typo="Typo.h5" Underline="Underline.None" Href="/" Class="ml-3 mr-3"><b>HeadsUp</b></MudLink>
         <CascadingAuthenticationState>
             <AuthorizeView>
                 <Authorized>
-                    <MudButton OnClick="LogOut" Class="mr-3" Variant="Variant.Filled" Color="Color.Secondary">Log Out</MudButton>
                     <p>Logged in - Name: @context.User.FindFirst(ClaimTypes.Name)?.Value - Role: @context.User.FindFirst(ClaimTypes.Role)?.Value</p>
                 </Authorized>
                 <NotAuthorized>
@@ -24,8 +25,8 @@
                 </NotAuthorized>
             </AuthorizeView>
         </CascadingAuthenticationState>
-        
         <MudSpacer/>
+        <MudButton OnClick="LogOut" Class="mr-2" Variant="Variant.Filled" Color="Color.Secondary">Log Out</MudButton>
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
         <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
     </MudAppBar>
@@ -60,6 +61,7 @@
         }
         else
         {
+            Snackbar.Add("Error logging out");
         }
     }
 

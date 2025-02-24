@@ -1,0 +1,29 @@
+﻿@page "/access-denied/{ErrorCause}"
+<div style="height: 90vh">
+    <MudText Typo="Typo.h1">Access Denied</MudText>
+    <MudText Typo="Typo.h3"><b>@ErrorMessage</b></MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Href="/">Back To Home</MudButton>
+</div>
+
+
+@code {
+    [Parameter] public string ErrorCause { get; set; }
+    private string ErrorMessage;
+    protected override Task OnInitializedAsync()
+    {
+        if (ErrorCause == "notauthenticated")
+        {
+            ErrorMessage = "You are not logged in.";
+        }
+        else if (ErrorCause == "incorrectrole")
+        {
+            ErrorMessage = "You do not have the correct role for this page.";
+        }
+        else
+        {
+            ErrorMessage = "Unexpected Error.";
+        }
+        return Task.CompletedTask;
+    }
+
+}

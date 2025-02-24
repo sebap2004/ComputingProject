@@ -24,7 +24,7 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
             if (Role == "Student")
             {
                 ClassroomStateService.AddStudent(Context.User.Identity.Name);
-                Clients.Group("Teacher").SendStudentJoinedMessage(ClassroomStateService.Users);
+                Clients.Group("Teacher").SendStudentJoinedMessage(ClassroomStateService.ConnectedUsers);
                 Console.WriteLine("sent student joined teacher");
             }
             if (Role  == "Teacher")
@@ -46,7 +46,7 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
             ClassroomStateService.RemoveStudent(Context.User.Identity.Name);
             if (Context.User.FindFirst(ClaimTypes.Role)?.Value == "Student")
             {
-                Clients.Group("Teacher").SendStudentLeftMessage(ClassroomStateService.Users);
+                Clients.Group("Teacher").SendStudentLeftMessage(ClassroomStateService.ConnectedUsers);
             }
         }
         return Task.CompletedTask;
@@ -71,8 +71,8 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
 
     public async Task GetStudents()
     {
-        Console.WriteLine("Get student list, count: " + ClassroomStateService.Users.Count);
-        await Clients.Group("Teacher").GetStudents(ClassroomStateService.Users);
+        Console.WriteLine("Get student list, count: " + ClassroomStateService.ConnectedUsers.Count);
+        await Clients.Group("Teacher").GetStudents(ClassroomStateService.ConnectedUsers);
     }
 
     public async Task SetClassroomState(ClassroomState stateToChangeTo)
