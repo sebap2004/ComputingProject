@@ -1,0 +1,12 @@
+﻿<MudItem xs="12" sm="12" md="6">
+    <MudPaper Height="85vh" Class="d-flex flex-column p-4 mud-width-full">
+        @ChildContent
+    </MudPaper>
+</MudItem>
+
+
+@code
+{
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+}

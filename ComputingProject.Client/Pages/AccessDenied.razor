@@ -1,7 +1,7 @@
 ﻿@page "/access-denied/{ErrorCause}"
 <div style="height: 90vh">
     <MudText Typo="Typo.h1">Access Denied</MudText>
-    <MudText Typo="Typo.h3"><b>@ErrorMessage</b></MudText>
+    <MudText GutterBottom="true" Typo="Typo.h3"><b>@ErrorMessage</b></MudText>
     <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Href="/">Back To Home</MudButton>
 </div>
 
@@ -25,5 +25,4 @@
         }
         return Task.CompletedTask;
     }
-
 }

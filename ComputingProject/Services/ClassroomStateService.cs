@@ -7,44 +7,86 @@ public class ClassroomStateService
 {
     // Current classroom state enum
     public ClassroomState classroomState { get; set; }
-    
+
     // Current users connected to the hub
-    public List<string> ConnectedUsers { get; set; } = new();
-    
+    public List<string> ConnectedStudents { get; set; } = new();
+
     // Current active help requests. String is the student's username
     public List<string> ActiveHelpRequests { get; set; } = new();
-    
-    // Current active questions in the session. Uses teacher object
-    public List<TeacherQuestion> ActiveQuestions { get; set; } = new ();
 
-    
+    // Current active questions in the session. Uses teacher object
+    public List<TeacherQuestion> ActiveQuestions { get; set; } = new();
+
+
     // Adds a student to the student list. String is user ID
     public void AddStudent(string user)
     {
-        ConnectedUsers.Add(user);
+        ConnectedStudents.Add(user);
     }
 
     // Removes a student to the student list. String is user ID
     public void RemoveStudent(string user)
     {
-        ConnectedUsers.Remove(user);
+        ConnectedStudents.Remove(user);
     }
-}
 
-// Teacher question object
-public class TeacherQuestion
-{
-    public TeacherQuestion(string question)
+    public void AddHelpRequest(string user)
     {
-        Question = question;
-        Answers = new();
+        ActiveHelpRequests.Add(user);
     }
-    
-    // Question text that the teacher asked
-    public string Question { get; set; }
-    
-    // Student's answers
-    public List<string> Answers { get; set; } 
+
+    public void RemoveHelpRequest(string user)
+    {
+        ActiveHelpRequests.Remove(user);
+    }
+
+    public void AddQuestion(TeacherQuestion question)
+    {
+        ActiveQuestions.Add(question);
+        Console.WriteLine("Question added!");
+        Console.WriteLine(question.Question);
+        Console.WriteLine(question.Id);
+        Console.WriteLine(question.Archived);
+        Console.WriteLine(question.Answers);
+
+        Console.WriteLine("CURRENT QUESTIONS IN MEMORY:");
+        foreach (var q in ActiveQuestions)
+        {
+            Console.WriteLine("------------------------");
+            Console.WriteLine(q.Question);
+            Console.WriteLine(q.Id);
+            Console.WriteLine(q.Archived);
+            Console.WriteLine("     ANSWERS:");
+            foreach (var answer in q.Answers)
+            {
+                Console.WriteLine("     " + answer);
+            }
+        }
+    }
+
+    public void ToggleArchivedQuestion(string questionID)
+    {
+        TeacherQuestion? questionToRemove = ActiveQuestions.FirstOrDefault(question => question.Id == questionID);
+        if (questionToRemove != null)
+        {
+            questionToRemove.Archived = !questionToRemove.Archived;
+        }
+        else
+        {
+            Console.Error.WriteLine("QUESTION NOT FOUND");
+        }
+    }
+
+    public void AddAnswerToQuestion(string questionID, string answer)
+    {
+        TeacherQuestion? questionToAnswer = ActiveQuestions.FirstOrDefault(question => question.Id == questionID);
+        if (questionToAnswer != null)
+        {
+            questionToAnswer.Answers.Add(answer);
+        }
+        else
+        {
+            Console.Error.WriteLine("QUESTION NOT FOUND");
+        }
+    }
 }
-
-

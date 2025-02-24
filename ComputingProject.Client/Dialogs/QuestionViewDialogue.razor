@@ -1,0 +1,15 @@
+﻿@using ComputingProject.Client.Services
+<MudDialog Visible="Open" Class="blur dialog-background" Style="width: 80vw; height: 70vh">
+    <DialogContent>
+        Dialog Content
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Error" >Cancel</MudButton>
+        <MudButton Color="Color.Primary" >Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public TeacherQuestion Question { get; set; }
+}

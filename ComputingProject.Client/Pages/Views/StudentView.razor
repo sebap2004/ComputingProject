@@ -9,4 +9,57 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<h3>StudentView</h3>
+<MudText GutterBottom="true" Align="Align.Center" Typo="Typo.h3"><b>Student View</b></MudText>
+<MudText Class="mb-3" Align="Align.Center" Typo="Typo.h6">Class is in @CurrentClassroomState Mode</MudText>
+<br/>
+<MudGrid>
+    <StudentGridItem>
+        <MudText Class="mb-3" Typo="Typo.h4"><b>Answer Teacher Questions</b></MudText>
+        @if (ActiveQuestions.Count <= 0)
+        {
+            <MudPaper Height="40rem" Class="mud-theme-primary is-flex is-justify-content-center is-align-items-center">
+                <MudText Typo="Typo.h3" Color="Color.Default">No questions yet!</MudText>
+            </MudPaper>
+        }
+        else
+        {
+            <MudText>@MessageInput</MudText>
+            <MudPaper Height="40rem" Class="mud-theme-primary is-overflow-y-auto p-2">
+                @foreach (var currentQuestion in ActiveQuestions)
+                {
+                    if (currentQuestion.Archived)
+                    {
+                        continue;
+                    }
+
+                    if (currentQuestion.StudentAnswered(UserName))
+                    {
+                        continue;
+                    }
+                    <MudPaper Class="p-4 mb-2" Height="10rem">
+                        <MudText Typo="Typo.h5">
+                            <b>@currentQuestion.Question</b>
+                        </MudText>
+                        <br/>
+                        <MudPaper Elevation="0" Class="d-flex flex-row">
+                            <MudTextField Immediate="true" OnKeyDown="(e) => Enter(e, currentQuestion.Id)" Variant="Variant.Outlined" T="string" @bind-Value="Answers[currentQuestion.Id]" Label="Answer" Placeholder="Write your answer!"></MudTextField>
+                            <MudButton OnClick="() => RespondToQuestion(currentQuestion.Id)" Variant="Variant.Filled" Size="Size.Medium" Class="ml-3" Color="Color.Primary">Submit</MudButton>
+                        </MudPaper>
+                    </MudPaper>
+                }
+            </MudPaper>
+        }
+    </StudentGridItem>
+    <StudentGridItem>
+        @if (CurrentClassroomState == ClassroomState.Workshop)
+        {
+            <MudSpacer></MudSpacer>
+            <MudPaper Class="d-flex is-align-items-center" Height="20%">k
+                <MudSpacer></MudSpacer>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.FrontHand" Style="width: 10rem; height: 10rem;">
+                    Ask for help
+                </MudButton>
+            </MudPaper>
+        }
+    </StudentGridItem>
+</MudGrid>

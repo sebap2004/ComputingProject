@@ -11,6 +11,12 @@ public class MockClassroomService : IClassroomService
     public event Action<List<String>>? OnStudentJoinedMessage;
     public event Action<List<String>>? OnStudentLeftMessage;
     public event Action<List<string>>? OnReceiveStudentList;
+    public event Action<List<string>>? OnReceiveActiveHelpRequests;
+    public event Action<List<TeacherQuestion>>? OnReceiveActiveQuestions;
+    public event Action<string>? OnArchiveTeacherQuestion;
+    public event Action? OnAcknowledgeHelpRequest;
+    public event Action? OnResolveHelpRequest;
+    public event Action<string>? OnAnsweredTeacherQuestion;
     public Task StartAsync() => Task.CompletedTask;
     public Task StopAsync() => Task.CompletedTask;
     public bool IsConnected() => false;

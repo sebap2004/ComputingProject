@@ -21,6 +21,18 @@ public class MockClassroomClient : IClassroomClient
         return Task.CompletedTask;
     }
 
+    public Task GetActiveHelpRequests(List<string> students)
+    {
+        return Task.CompletedTask;
+        
+    }
+
+    public Task GetActiveQuestions(List<TeacherQuestion> questions)
+    {
+        return Task.CompletedTask;
+        
+    }
+
     public Task SendStudentJoinedMessage(List<string> Users)
     {
         return Task.CompletedTask;
@@ -29,6 +41,24 @@ public class MockClassroomClient : IClassroomClient
     public Task SendStudentLeftMessage(List<string> Users)
     {
         return Task.CompletedTask;
+    }
+
+    public Task ReceiveAcknowledgementForHelpRequest()
+    {
+        return Task.CompletedTask;
+        
+    }
+
+    public Task ReceiveResolutionForHelpRequest()
+    {
+        return Task.CompletedTask;
+        
+    }
+
+    public Task AnswerTeacherQuestion(string questionID, string answer)
+    {
+        return Task.CompletedTask;
+        
     }
 
     public Task SendStudentJoinedMessage(List<ClaimsPrincipal> Users)

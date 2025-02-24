@@ -48,7 +48,7 @@
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="Send">Send Message</MudButton>
                 </MudPaper>
                 <MudPaper Width="10%" Class="d-flex justify-center">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="SetSeminarState">Set To Seminar</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="SetWorkshopState">Set To Workshop</MudButton>
                 </MudPaper>
                 <MudPaper Width="10%" Class="d-flex justify-center">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="SetLectureState">Set To Lecture</MudButton>
@@ -163,9 +163,9 @@ else
         }
     }
     
-    public async Task SetSeminarState()
+    public async Task SetWorkshopState()
     {
-        await ClassroomServer.SetClassroomState(ClassroomState.Seminar);
+        await ClassroomServer.SetClassroomState(ClassroomState.Workshop);
     }
     
     public async Task SetLectureState()

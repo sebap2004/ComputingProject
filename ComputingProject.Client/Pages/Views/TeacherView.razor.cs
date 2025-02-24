@@ -9,18 +9,26 @@ namespace ComputingProject.Client.Pages.Views;
 
 public partial class TeacherView : ComponentBase
 {
-    private MudTheme Theme = new MudTheme();
-    ClassroomState currentState;
+    // Members related to the classroom state
+    private List<string> ConnectedStudents { get; set; } = new List<string>();
+    public List<string> ActiveHelpRequests { get; set; } = new();
+    public List<TeacherQuestion> ActiveQuestions { get; set; } = new ();
+    private int StudentCount => ConnectedStudents.Count;
+    private ClassroomState CurrentClassroomState;
     private List<Message> messages = new List<Message>();
+    private string? SelectQuestionID {get; set;}
+    private TeacherQuestion? SelectedQuestionObject { get; set; }
+    
+    
+    private MudTheme Theme = new MudTheme();
     private string UserName { get; set; }
     private string UserRole { get; set; }
-    private string MessageInput;
+    private string QuestionInput { get; set; }
+    private Color WorkshopButtonColor => CurrentClassroomState == ClassroomState.Workshop ? Color.Primary : Color.Secondary;
+    private Color LectureButtonColor => CurrentClassroomState == ClassroomState.Lecture ? Color.Primary : Color.Secondary;
+    private Color ArchiveColor(bool archived) => archived ? Color.Secondary : Color.Warning;
+    private Color ViewingColor(bool archived) => archived ? Color.Primary : Color.Info;
     
-    private Color SeminarButtonColor => currentState == ClassroomState.Seminar ? Color.Primary : Color.Secondary;
-    private Color LectureButtonColor => currentState == ClassroomState.Lecture ? Color.Primary : Color.Secondary;
-    
-    public List<string> JoinedStudents { get; set; } = new List<string>();
-    public int StudentCount => JoinedStudents.Count;
 
     protected override async Task OnInitializedAsync()
     {
@@ -45,46 +53,12 @@ public partial class TeacherView : ComponentBase
 
     public async Task ConnectToHub()
     {
-        ClassroomService.OnMessageReceived += (puser, pmessage, system) =>
-        {
-            Message message = new Message()
-            {
-                user = puser,
-                message = pmessage,
-                systemMessage = system
-            };
-            messages.Add(message);
-            
-            StateHasChanged();
-        };
-
-        ClassroomService.GetState += state =>
-        {
-            currentState = state;
-        };
-
-        ClassroomService.OnStudentJoinedMessage += (connectionList) =>
-        {
-            JoinedStudents = connectionList;
-            Snackbar.Add("Student joined", Severity.Success);
-            StateHasChanged();
-            Console.WriteLine("Joined Students Count: " + JoinedStudents.Count);
-        };
-        
-        ClassroomService.OnStudentLeftMessage += (connectionList) =>
-        {
-            JoinedStudents = connectionList;
-            Snackbar.Add("Student Left", Severity.Info);
-            StateHasChanged();
-            Console.WriteLine("Joined Students Count: " + JoinedStudents.Count);
-        };
-
-        ClassroomService.OnReceiveStudentList += (connectionList) =>
-        {
-            JoinedStudents = connectionList;
-            Snackbar.Add("Student List Updated", Severity.Info);
-            StateHasChanged();
-        };
+        ClassroomService.OnMessageReceived += OnClassroomServiceOnOnMessageReceived;
+        ClassroomService.GetState += OnClassroomServiceOnGetState;
+        ClassroomService.OnStudentJoinedMessage += OnClassroomServiceOnOnStudentJoinedMessage;
+        ClassroomService.OnStudentLeftMessage += OnClassroomServiceOnOnStudentLeftMessage;
+        ClassroomService.OnReceiveStudentList += OnClassroomServiceOnOnReceiveStudentList;
+        ClassroomService.OnReceiveActiveQuestions += ReceiveActiveQuestions;
         try
         {
             await ClassroomService.StartAsync();
@@ -97,7 +71,7 @@ public partial class TeacherView : ComponentBase
             await ClassroomServer.GetClassroomState(UserName);
             StateHasChanged();
             await ClassroomServer.GetStudents();
-            
+            await ClassroomServer.GetActiveQuestions();
         }
         catch (Exception ex)
         {
@@ -106,34 +80,92 @@ public partial class TeacherView : ComponentBase
         }
     }
 
-    async Task Send()
+    private void ReceiveActiveQuestions(List<TeacherQuestion> obj)
     {
-        if (string.IsNullOrWhiteSpace(MessageInput)) return;
-    
-        var tempMessage = MessageInput;
-        MessageInput = string.Empty;
+        ActiveQuestions = obj;
+        ShowQuestion(SelectQuestionID);
+        Console.WriteLine("Refreshed show question list");
         StateHasChanged();
-
-        await ClassroomServer.SendMessage(UserName, tempMessage, false);
     }
 
-    private async Task Enter(KeyboardEventArgs e)
+    private void ShowQuestion(string id)
+    {
+        SelectQuestionID = id;
+        Console.WriteLine("Showing question " + id + "...");
+        SelectedQuestionObject = ActiveQuestions.FirstOrDefault(q => q.Id == id);
+        StateHasChanged();
+    }
+
+    private void OnClassroomServiceOnOnReceiveStudentList(List<string> connectionList)
+    {
+        ConnectedStudents = connectionList;
+        Snackbar.Add("Student List Updated", Severity.Info);
+        StateHasChanged();
+    }
+
+    private void OnClassroomServiceOnOnMessageReceived(string puser, string pmessage, bool system)
+    {
+        Message message = new Message() { user = puser, message = pmessage, systemMessage = system };
+        messages.Add(message);
+
+        StateHasChanged();
+    }
+
+    private void OnClassroomServiceOnOnStudentLeftMessage(List<string> connectionList)
+    {
+        ConnectedStudents = connectionList;
+        Snackbar.Add("Student Left", Severity.Info);
+        StateHasChanged();
+        Console.WriteLine("Joined Students Count: " + ConnectedStudents.Count);
+    }
+
+    private void OnClassroomServiceOnOnStudentJoinedMessage(List<string> connectionList)
+    {
+        ConnectedStudents = connectionList;
+        Snackbar.Add("Student joined", Severity.Success);
+        StateHasChanged();
+        Console.WriteLine("Joined Students Count: " + ConnectedStudents.Count);
+    }
+
+    private void OnClassroomServiceOnGetState(ClassroomState state)
+    {
+        CurrentClassroomState = state;
+        StateHasChanged();
+    }
+
+    async Task SendTeacherQuestion()
+    {
+        Console.WriteLine("Sending Teacher Question, current question text is " + QuestionInput);
+        if (string.IsNullOrWhiteSpace(QuestionInput)) return;
+        var tempMessage = QuestionInput;
+        QuestionInput = string.Empty;
+        StateHasChanged();
+        TeacherQuestion tempQuestion = new TeacherQuestion(RandomIDGenerator.GenerateRandomID(), tempMessage);
+        await ClassroomServer.SendTeacherQuestion(tempQuestion);
+    }
+
+    private async Task EnterHandler(KeyboardEventArgs e)
     {
         if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
-            await Send();
+            await SendTeacherQuestion();
         }
     }
-    
-    public async Task SetSeminarState() 
+
+    private async Task ArchiveQuestion(string questionID)
     {
-        if (currentState == ClassroomState.Seminar) return;
-        await ClassroomServer.SetClassroomState(ClassroomState.Seminar);
+        await ClassroomServer.ArchiveTeacherQuestion(questionID);
+    }
+    
+    public async Task SetWorkshopState() 
+    {
+        if (CurrentClassroomState == ClassroomState.Workshop) return;
+        await ClassroomServer.SetClassroomState(ClassroomState.Workshop);
     }
     
     public async Task SetLectureState()
     {
-        if (currentState == ClassroomState.Lecture) return;
+        if (CurrentClassroomState == ClassroomState.Lecture) return;
         await ClassroomServer.SetClassroomState(ClassroomState.Lecture);
     }
 

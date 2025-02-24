@@ -34,6 +34,52 @@ public class ClassroomServerProxy : IClassroomServer
         Console.WriteLine("Invoked GetStudents");
     }
 
+    public async Task GetActiveHelpRequests()
+    {
+        await _hubConnection.InvokeAsync("GetActiveHelpRequests");
+    }
+
+    public async Task GetActiveQuestions()
+    {
+        await _hubConnection.InvokeAsync("GetActiveQuestions");
+    }
+
+    public async Task SendTeacherQuestion(TeacherQuestion question)
+    {
+        Console.WriteLine("Sending tq message to hub: " + question.Question + " - " + question.Archived);
+        await _hubConnection.InvokeAsync("SendTeacherQuestion", question);
+    }
+
+    public async Task AnswerTeacherQuestion(string studentID, string questionID, string answer)
+    {
+        await _hubConnection.InvokeAsync("AnswerTeacherQuestion", studentID, questionID, answer);
+    }
+
+    public async Task SendHelpRequest(string requestID)
+    {
+        await _hubConnection.InvokeAsync("SendHelpRequest", requestID);
+    }
+
+    public async Task CancelHelpRequest(string requestID)
+    {
+        await _hubConnection.InvokeAsync("CancelHelpRequest", requestID);
+    }
+
+    public async Task AcknowledgeHelpRequest(string requestID)
+    {
+        await _hubConnection.InvokeAsync("AcknowledgeHelpRequest", requestID);
+    }
+
+    public async Task ResolveHelpRequest(string requestID)
+    {
+        await _hubConnection.InvokeAsync("ResolveHelpRequest", requestID);
+    }
+
+    public async Task ArchiveTeacherQuestion(string questionID)
+    {
+        await _hubConnection.InvokeAsync("ArchiveTeacherQuestion", questionID);
+    }
+
     public async Task SetClassroomState(ClassroomState stateToChangeTo)
     {
         await _hubConnection.InvokeAsync("SetClassroomState", stateToChangeTo);

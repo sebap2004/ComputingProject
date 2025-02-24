@@ -15,6 +15,12 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
     public event Action<List<String>>? OnStudentJoinedMessage;
     public event Action<List<String>>? OnStudentLeftMessage;
     public event Action<List<string>>? OnReceiveStudentList;
+    public event Action<List<string>>? OnReceiveActiveHelpRequests;
+    public event Action<List<TeacherQuestion>>? OnReceiveActiveQuestions;
+    public event Action<string>? OnArchiveTeacherQuestion;
+    public event Action? OnAcknowledgeHelpRequest;
+    public event Action? OnResolveHelpRequest;
+    public event Action<string>? OnAnsweredTeacherQuestion;
 
 
     public ClassroomClientService(HubConnection hubConnection)
@@ -25,6 +31,36 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
         _hubConnection.On<List<String>>("SendStudentJoinedMessage", SendStudentJoinedMessage);
         _hubConnection.On<List<String>>("SendStudentLeftMessage", SendStudentLeftMessage);
         _hubConnection.On<List<String>>("GetStudents", GetStudents);
+        _hubConnection.On<List<String>>("GetActiveHelpRequests", GetActiveHelpRequests);
+        _hubConnection.On<List<TeacherQuestion>>("GetActiveQuestions", GetActiveQuestions);
+        _hubConnection.On<string>("ArchiveTeacherQuestion", ArchiveTeacherMethods);
+        _hubConnection.On<string>("ResolveHelpRequest", ResolveHelpRequest);
+        _hubConnection.On<string>("AcknowledgeHelpRequest", AcknowledgeHelpRequest);
+        _hubConnection.On<string, string>("AnswerTeacherQuestion", AnswerTeacherQuestion);
+    }
+
+    public Task AnswerTeacherQuestion(string questionID, string answer)
+    {
+        OnAnsweredTeacherQuestion?.Invoke(questionID);
+        return Task.CompletedTask;
+    }
+
+    private Task AcknowledgeHelpRequest(string obj)
+    {
+        OnAcknowledgeHelpRequest?.Invoke();
+        return Task.CompletedTask;
+    }
+
+    private Task ResolveHelpRequest(string obj)
+    {
+        OnResolveHelpRequest?.Invoke();
+        return Task.CompletedTask;
+    }
+
+    private Task ArchiveTeacherMethods(string obj)
+    {
+        OnArchiveTeacherQuestion?.Invoke(obj);
+        return Task.CompletedTask;
     }
 
     public async Task StartAsync()
@@ -66,6 +102,18 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
         return Task.CompletedTask;
     }
 
+    public Task GetActiveHelpRequests(List<string> requests)
+    {
+        OnReceiveActiveHelpRequests?.Invoke(requests);
+        return Task.CompletedTask;
+    }
+
+    public Task GetActiveQuestions(List<TeacherQuestion> students)
+    {
+        OnReceiveActiveQuestions?.Invoke(students);
+        return Task.CompletedTask;
+    }
+
     public Task SendStudentJoinedMessage(List<String> Users)
     {
         OnStudentJoinedMessage?.Invoke(Users);
@@ -77,10 +125,22 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
         OnStudentLeftMessage?.Invoke(Users);
         return Task.CompletedTask;
     }
+
+    public Task ReceiveAcknowledgementForHelpRequest()
+    {
+        OnAcknowledgeHelpRequest?.Invoke();
+        return Task.CompletedTask;
+    }
+
+    public Task ReceiveResolutionForHelpRequest()
+    {
+        OnResolveHelpRequest?.Invoke();
+        return Task.CompletedTask;
+    }
 }
 
 public enum ClassroomState
 {
     Lecture,
-    Seminar
+    Workshop
 }

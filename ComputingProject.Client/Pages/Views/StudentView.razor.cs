@@ -10,12 +10,15 @@ namespace ComputingProject.Client.Pages.Views;
 
 public partial class StudentView : ComponentBase
 {
-    ClassroomState currentState;
-    private List<Message> messages = new List<Message>();
+    ClassroomState CurrentClassroomState;
+    public List<TeacherQuestion> ActiveQuestions { get; set; } = new ();
+    private string MessageInput;
+    private MudTheme Theme = new MudTheme();
     private string UserName { get; set; }
     private string UserRole { get; set; }
-    private string MessageInput;
-    
+
+    private List<string> QuestionIDs = new();
+    private Dictionary<string, string> Answers = new();
     
     protected override async Task OnInitializedAsync()
     {
@@ -37,26 +40,10 @@ public partial class StudentView : ComponentBase
         }
     }
 
-    public async Task ConnectToHub()
+    private async Task ConnectToHub()
     {
-        ClassroomService.OnMessageReceived += (puser, pmessage, system) =>
-        {
-            Message message = new Message()
-            {
-                user = puser,
-                message = pmessage,
-                systemMessage = system
-            };
-            messages.Add(message);
-            
-            StateHasChanged();
-        };
-        
-        ClassroomService.OnJoinGetState += state =>
-        {
-            currentState = state;
-            Snackbar.Add("HOly shit received the state: " + state, currentState == ClassroomState.Lecture ? Severity.Success : Severity.Warning);
-        };
+        ClassroomService.GetState += OnClassroomServiceOnGetState;
+        ClassroomService.OnReceiveActiveQuestions += ReceiveActiveQuestions;
         
         try 
         {
@@ -76,8 +63,7 @@ public partial class StudentView : ComponentBase
             Snackbar.Add("Successfully connected to classroom as " + UserName, Severity.Success);
 
             await InvokeAsync(StateHasChanged);
-    
-            await ClassroomServer.SendMessage(UserName, UserName + " has joined the classroom!", true);
+            await ClassroomServer.GetActiveQuestions();
         }
         catch (Exception ex)
         {
@@ -85,41 +71,52 @@ public partial class StudentView : ComponentBase
             Snackbar.Add("Failed to connect to classroom: " + ex.Message, Severity.Error);
         }
     }
-
-    async Task Send()
-    {
-        if (string.IsNullOrWhiteSpace(MessageInput)) return;
     
-        var tempMessage = MessageInput;
-        MessageInput = string.Empty; // Clear input before sending
-        StateHasChanged(); // Ensure UI updates before sending the message
-
-        await ClassroomServer.SendMessage(UserName, tempMessage, false);
+    private void ReceiveActiveQuestions(List<TeacherQuestion> obj)
+    {
+        ActiveQuestions = obj;
+        Answers.Clear();
+        QuestionIDs.Clear();
+        foreach (var question in ActiveQuestions)
+        {
+            Answers.Add(question.Id, "");
+            QuestionIDs.Add(question.Id);
+        }
+        StateHasChanged();
+        Console.WriteLine("NEW DICTIONARY VALUES:");
+        foreach (var epic in Answers)
+        {
+            Console.WriteLine(epic.Key + ": " + epic.Value);
+        }
     }
     
-    async Task SendToTeacher()
+    private void OnClassroomServiceOnGetState(ClassroomState state)
     {
-        if (string.IsNullOrWhiteSpace(MessageInput)) return;
+        CurrentClassroomState = state;
+        StateHasChanged();
+    }
     
-        var tempMessage = MessageInput;
-        MessageInput = string.Empty; // Clear input before sending
-        StateHasChanged(); // Ensure UI updates before sending the message
+    async Task RespondToQuestion(string questionID)
+    {
+        Console.WriteLine("Trying to respond to question with id: " + questionID);
+        string answer = Answers[questionID];
 
-        await ClassroomServer.SendMessageToTeacher(UserName, tempMessage, false);
+        if (string.IsNullOrWhiteSpace(answer))
+        {
+            
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+            Snackbar.Add("Box cannot be empty.", Severity.Error);
+            return;
+        }
+        
+        await ClassroomServer.AnswerTeacherQuestion(UserName, questionID, answer);
     }
 
-    private async Task Enter(KeyboardEventArgs e)
+    private async Task Enter(KeyboardEventArgs e, string questionID)
     {
         if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
-            await Send();
+            await RespondToQuestion(questionID);
         }
-    }
-
-    public struct Message
-    {
-        public string user;
-        public string message;
-        public bool systemMessage;
     }
 }
