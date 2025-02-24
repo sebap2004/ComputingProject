@@ -11,9 +11,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <MudText Align="Align.Center" Typo="Typo.h3"><b>Teacher View</b></MudText>
-
 <br/>
-
 <MudGrid>
     <TeacherGridItem>
         <MudText Typo="Typo.h4"><b>Manage Classroom</b></MudText>
@@ -114,14 +112,14 @@
                   Class="is-overflow-y-auto mb-2" Elevation="0">
             <MudPaper Class="p-4" Elevation="0" Style="@($"background:{Color.Transparent};")">
                 <MudGrid Spacing="1">
-                    @foreach (string student in ConnectedStudents)
+                    @foreach (string student in ActiveHelpRequests)
                     {
                         <MudItem xs="12">
                             <MudPaper Class="p-2 d-flex flex-row align-center">
-                                <MudText>Student 1 needs help</MudText>
+                                <MudText>Student @student needs help</MudText>
                                 <MudSpacer></MudSpacer>
-                                <MudButton Color="Color.Secondary" Variant="Variant.Filled">Acknowledge</MudButton>
-                                <MudButton Class="ml-2" Color="Color.Primary" Variant="Variant.Filled">Mark as
+                                <MudButton OnClick="() => SendAcknowledgement(student)" Color="Color.Secondary" Variant="Variant.Filled">Acknowledge</MudButton>
+                                <MudButton OnClick="() => SendResolve(student)" Class="ml-2" Color="Color.Primary" Variant="Variant.Filled">Mark as
                                     resolved
                                 </MudButton>
                             </MudPaper>

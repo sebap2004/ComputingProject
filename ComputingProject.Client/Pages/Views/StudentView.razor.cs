@@ -16,17 +16,38 @@ public partial class StudentView : ComponentBase
     private MudTheme Theme = new MudTheme();
     private string UserName { get; set; }
     private string UserRole { get; set; }
-
     private List<string> QuestionIDs = new();
     private Dictionary<string, string> Answers = new();
+
+    private string HandUpIcon => HasHandUp ? Icons.Material.Filled.Cancel : Icons.Material.Filled.FrontHand;
+    private Color HandUpColor => HasHandUp ? Color.Error : Color.Primary;
+    
+    private bool HelpRequestAcknowledged { get; set; }
+    
+    public bool HasHandUp {get; set;}
+
+    private async Task AskForHelp()
+    {
+        if (HasHandUp)
+        {
+            await ClassroomServer.CancelHelpRequest(UserName);
+            HasHandUp = false;
+            HelpRequestAcknowledged = false;
+        }
+        else
+        {
+            await ClassroomServer.SendHelpRequest(UserName);
+            HasHandUp = true;
+        }
+    }
     
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        if (user.Identity.IsAuthenticated)
+        if (user.Identity!.IsAuthenticated)
         {
-            UserName = user.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
+            UserName = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Unknown";
             UserRole = user.FindFirst(ClaimTypes.Role)?.Value ?? "No role";
             if (UserRole != "Student")
             {
@@ -44,6 +65,8 @@ public partial class StudentView : ComponentBase
     {
         ClassroomService.GetState += OnClassroomServiceOnGetState;
         ClassroomService.OnReceiveActiveQuestions += ReceiveActiveQuestions;
+        ClassroomService.OnResolveHelpRequest += ClassroomServiceOnOnResolveHelpRequest;
+        ClassroomService.OnAcknowledgeHelpRequest += ClassroomServiceOnOnAcknowledgeHelpRequest;
         
         try 
         {
@@ -71,7 +94,22 @@ public partial class StudentView : ComponentBase
             Snackbar.Add("Failed to connect to classroom: " + ex.Message, Severity.Error);
         }
     }
-    
+
+    private void ClassroomServiceOnOnAcknowledgeHelpRequest()
+    {
+        Console.WriteLine("Acknowledge Help Request");
+        HelpRequestAcknowledged = true;
+        StateHasChanged();
+    }
+
+    private void ClassroomServiceOnOnResolveHelpRequest()
+    {
+        Console.WriteLine("Resolve Help Request");
+        HelpRequestAcknowledged = false;
+        HasHandUp = false;
+        StateHasChanged();
+    }
+
     private void ReceiveActiveQuestions(List<TeacherQuestion> obj)
     {
         ActiveQuestions = obj;

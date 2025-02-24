@@ -28,8 +28,20 @@ public partial class TeacherView : ComponentBase
     private Color LectureButtonColor => CurrentClassroomState == ClassroomState.Lecture ? Color.Primary : Color.Secondary;
     private Color ArchiveColor(bool archived) => archived ? Color.Secondary : Color.Warning;
     private Color ViewingColor(bool archived) => archived ? Color.Primary : Color.Info;
-    
 
+
+    private async Task SendAcknowledgement(string ID)
+    {
+        Console.WriteLine("Acknowledging " + ID);
+        await ClassroomServer.AcknowledgeHelpRequest(ID);
+    }
+    
+    private async Task SendResolve(string ID)
+    {
+        Console.WriteLine("Resolving " + ID);
+        await ClassroomServer.ResolveHelpRequest(ID);
+    }
+    
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -59,6 +71,7 @@ public partial class TeacherView : ComponentBase
         ClassroomService.OnStudentLeftMessage += OnClassroomServiceOnOnStudentLeftMessage;
         ClassroomService.OnReceiveStudentList += OnClassroomServiceOnOnReceiveStudentList;
         ClassroomService.OnReceiveActiveQuestions += ReceiveActiveQuestions;
+        ClassroomService.OnReceiveActiveHelpRequests += ClassroomServiceOnOnReceiveActiveHelpRequests;
         try
         {
             await ClassroomService.StartAsync();
@@ -78,6 +91,12 @@ public partial class TeacherView : ComponentBase
             // Handle connection errors
             Snackbar.Add("Failed to connect to classroom: " + ex.Message, Severity.Error);
         }
+    }
+
+    private void ClassroomServiceOnOnReceiveActiveHelpRequests(List<string> obj)
+    {
+        ActiveHelpRequests = obj;
+        StateHasChanged();
     }
 
     private void ReceiveActiveQuestions(List<TeacherQuestion> obj)

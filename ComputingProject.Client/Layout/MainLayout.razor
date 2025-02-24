@@ -18,7 +18,7 @@
         <CascadingAuthenticationState>
             <AuthorizeView>
                 <Authorized>
-                    <p>Logged in - Name: @context.User.FindFirst(ClaimTypes.Name)?.Value - Role: @context.User.FindFirst(ClaimTypes.Role)?.Value</p>
+                    <p>Logged in - Name: @context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value - Role: @context.User.FindFirst(ClaimTypes.Role)?.Value</p>
                 </Authorized>
                 <NotAuthorized>
                     <p>Not Logged In</p>

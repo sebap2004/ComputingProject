@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
         }
         else
         {
-            if (model.Password == "studentpassword")
+            if (model.Password == "password")
             {
                 // Sign in
                 Console.WriteLine("Successfully logged in as student - Username: " + model.Username + " IsTeacher: " + model.IsTeacher);

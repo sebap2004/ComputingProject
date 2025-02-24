@@ -34,8 +34,8 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
         _hubConnection.On<List<String>>("GetActiveHelpRequests", GetActiveHelpRequests);
         _hubConnection.On<List<TeacherQuestion>>("GetActiveQuestions", GetActiveQuestions);
         _hubConnection.On<string>("ArchiveTeacherQuestion", ArchiveTeacherMethods);
-        _hubConnection.On<string>("ResolveHelpRequest", ResolveHelpRequest);
-        _hubConnection.On<string>("AcknowledgeHelpRequest", AcknowledgeHelpRequest);
+        _hubConnection.On("ReceiveAcknowledgementForHelpRequest", AcknowledgeHelpRequest);
+        _hubConnection.On("ReceiveResolutionForHelpRequest", ResolveHelpRequest);
         _hubConnection.On<string, string>("AnswerTeacherQuestion", AnswerTeacherQuestion);
     }
 
@@ -45,14 +45,16 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
         return Task.CompletedTask;
     }
 
-    private Task AcknowledgeHelpRequest(string obj)
+    private Task AcknowledgeHelpRequest()
     {
+        Console.WriteLine("Received acknowledgement");
         OnAcknowledgeHelpRequest?.Invoke();
         return Task.CompletedTask;
     }
 
-    private Task ResolveHelpRequest(string obj)
+    private Task ResolveHelpRequest()
     {
+        Console.WriteLine("Received help");
         OnResolveHelpRequest?.Invoke();
         return Task.CompletedTask;
     }
@@ -104,12 +106,14 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
 
     public Task GetActiveHelpRequests(List<string> requests)
     {
+        Console.WriteLine("Received Active Help Requests");
         OnReceiveActiveHelpRequests?.Invoke(requests);
         return Task.CompletedTask;
     }
 
     public Task GetActiveQuestions(List<TeacherQuestion> students)
     {
+        Console.WriteLine("GetActiveQuestions");
         OnReceiveActiveQuestions?.Invoke(students);
         return Task.CompletedTask;
     }

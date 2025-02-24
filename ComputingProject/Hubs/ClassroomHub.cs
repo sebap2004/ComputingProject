@@ -115,12 +115,17 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
 
     public async Task AcknowledgeHelpRequest(string requestID)
     {
-        await Clients.User(requestID).ReceiveAcknowledgementForHelpRequest();
+        await Clients.Group("Student").ReceiveAcknowledgementForHelpRequest();
+        await Clients.Group("Teacher").GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
+        Console.WriteLine("Sending acknowledgement to " + requestID);
     }
 
     public async Task ResolveHelpRequest(string requestID)
     {
-        await Clients.User(requestID).ReceiveResolutionForHelpRequest();
+        ClassroomStateService.RemoveHelpRequest(requestID);
+        Console.WriteLine("Sending resolution to " + requestID);
+        await Clients.Group("Student").ReceiveResolutionForHelpRequest();        
+        await Clients.Group("Teacher").GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
     }
 
     public async Task ArchiveTeacherQuestion(string questionID)
