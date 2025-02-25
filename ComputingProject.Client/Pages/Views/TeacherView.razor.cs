@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using ComputingProject.Client.Services;
+using ComputingProject.Client.Themes;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -21,10 +22,7 @@ public partial class TeacherView : ComponentBase
     private List<string> AcknowledgedQuestions { get; set; } = new();
     private bool QuestionIsAcknowledged(string questionId) => AcknowledgedQuestions.Contains(questionId);
     private bool IsConnected { get; set; }
-    
-    
-    
-    private MudTheme Theme = new MudTheme();
+    private MudTheme Theme = new DefaultTheme();
     private string UserName { get; set; }
     private string UserRole { get; set; }
     private string QuestionInput { get; set; }
@@ -34,18 +32,18 @@ public partial class TeacherView : ComponentBase
     private Color ViewingColor(bool archived) => archived ? Color.Primary : Color.Info;
 
 
-    private async Task SendAcknowledgement(string ID)
+    private void SendAcknowledgement(string ID)
     {
         Console.WriteLine("Acknowledging " + ID);
-        await ClassroomServer.AcknowledgeHelpRequest(ID);
+        ClassroomServer.AcknowledgeHelpRequest(ID);
         AcknowledgedQuestions.Add(ID);
         StateHasChanged();
     }
     
-    private async Task SendResolve(string ID)
+    private void SendResolve(string ID)
     {
         Console.WriteLine("Resolving " + ID);
-        await ClassroomServer.ResolveHelpRequest(ID);
+        ClassroomServer.ResolveHelpRequest(ID);
         AcknowledgedQuestions.Remove(ID);
         StateHasChanged();
     }
@@ -134,9 +132,9 @@ public partial class TeacherView : ComponentBase
         StateHasChanged();
     }
 
-    public async Task DeleteQuestion(string id)
+    public void DeleteQuestion(string id)
     {
-        await ClassroomServer.DeleteTeacherQuestion(id);
+        ClassroomServer.DeleteTeacherQuestion(id);
     }
     
     private void OnClassroomServiceOnOnReceiveStudentList(List<string> connectionList)
@@ -195,9 +193,9 @@ public partial class TeacherView : ComponentBase
         }
     }
 
-    private async Task ArchiveQuestion(string questionID)
+    private void ArchiveQuestion(string questionID)
     {
-        await ClassroomServer.ArchiveTeacherQuestion(questionID);
+        ClassroomServer.ArchiveTeacherQuestion(questionID);
     }
     
     public async Task SetWorkshopState() 

@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using ComputingProject.Client.Components
 @using ComputingProject.Client.Dialogs
+@using MudExtensions
 @rendermode InteractiveWebAssembly
 @inject ISnackbar Snackbar
 @inject IClassroomService ClassroomService
@@ -23,11 +24,19 @@
                     <MudItem>
                         <MudButton Variant="Variant.Filled" Color="LectureButtonColor" OnClick="SetLectureState">
                             Lecture
+                            @if (CurrentClassroomState == ClassroomState.Lecture)
+                            {
+                                <MudIcon Class="ml-2" Icon="@Icons.Material.Filled.Check"></MudIcon>
+                            }
                         </MudButton>
                     </MudItem>
                     <MudItem>
                         <MudButton Variant="Variant.Filled" Color="WorkshopButtonColor" OnClick="SetWorkshopState">
                             Workshop
+                            @if (CurrentClassroomState == ClassroomState.Workshop)
+                            {
+                                <MudIcon Class="ml-2" Icon="@Icons.Material.Filled.Check"></MudIcon>
+                            }
                         </MudButton>
                     </MudItem>
                 </MudGrid>
@@ -55,7 +64,7 @@
         </TeacherGridItem>
         <TeacherGridItem>
             <MudText GutterBottom="true" Typo="Typo.h4"><b>Send Question</b></MudText>
-            <MudPaper Class="d-flex flex-row mb-3">
+            <MudPaper Elevation="0" Class="d-flex flex-row mb-3">
                 <MudTextField Immediate="true" OnKeyDown="EnterHandler" T="string" @bind-Value="QuestionInput"
                               Placeholder="Ask your students a question" Label="Question" Variant="Variant.Filled"
                               Typo="Typo.h5"></MudTextField>
@@ -70,54 +79,13 @@
                     <MudGrid Spacing="1">
                         @foreach (var question in ActiveQuestions)
                         {
-                            <MudItem xs="12">
-                                <MudPaper Class="p-2 d-flex flex-row align-center">
-                                    <MudGrid>
-                                        <MudItem sm="12" md="12" lg="6" Style="word-break: break-word">
-                                            <MudText><b>@question.Question</b></MudText>
-                                            <MudSpacer></MudSpacer>
-                                            <MudText Class="mr-2">@question.Answers.Count Answers</MudText>
-                                        </MudItem>
-
-                                        <MudItem sm="12" md="6"
-                                                 Class="is-display-flex is-justify-content-end is-align-items-center">
-                                            <MudButton OnClick="() => ShowQuestion(question.Id)"
-                                                       Color="ViewingColor(SelectQuestionID == question.Id)"
-                                                       Variant="Variant.Filled">
-                                                @if (SelectQuestionID == question.Id)
-                                                {
-                                                    <MudText Typo="Typo.button">Viewing</MudText>
-                                                }
-                                                else
-                                                {
-                                                    <MudText Typo="Typo.button">View Answers</MudText>
-                                                }
-                                            </MudButton>
-                                            <MudButton OnClick="() => ArchiveQuestion(question.Id)" Class="ml-2"
-                                                       Color="ArchiveColor(question.Archived)" Variant="Variant.Filled">
-                                                @if (question.Archived)
-                                                {
-                                                    <MudText Class="mr-2" Align="Align.Center" Typo="Typo.button">Show
-                                                    </MudText>
-                                                    <MudIcon Icon="@Icons.Material.Outlined.Unarchive"></MudIcon>
-                                                }
-                                                else
-                                                {
-                                                    <MudText Class="mr-2" Align="Align.Center" Typo="Typo.button">Hide
-                                                    </MudText>
-                                                    <MudIcon Icon="@Icons.Material.Outlined.Archive"></MudIcon>
-                                                }
-                                            </MudButton>
-                                            <MudButton OnClick="() => DeleteQuestion(question.Id)" Class="ml-2"
-                                                       Color="Color.Error"
-                                                       Variant="Variant.Filled"
-                                                       StartIcon="@Icons.Material.Outlined.Delete">
-                                                Delete
-                                            </MudButton>
-                                        </MudItem>
-                                    </MudGrid>
-                                </MudPaper>
-                            </MudItem>
+                            <TeacherViewQuestion OnDelete="_ => DeleteQuestion(question.Id)"
+                                                 OnArchive="_ => ArchiveQuestion(question.Id)"
+                                                 OnShow="_ => ShowQuestion(question.Id)"
+                                                 question="question"
+                                                 SelectQuestionID="@SelectQuestionID"
+                                                 ArchiveColor="ArchiveColor(question.Archived)"
+                                                 ViewingColor="ViewingColor(SelectQuestionID == question.Id)"></TeacherViewQuestion>
                         }
                     </MudGrid>
                 </MudPaper>
@@ -135,28 +103,10 @@
                     <MudGrid Spacing="1">
                         @foreach (string student in ActiveHelpRequests)
                         {
-                            <MudItem xs="12">
-                                <MudPaper Class="p-2 d-flex flex-row align-center">
-                                    <MudText>Student @student needs help</MudText>
-                                    <MudSpacer></MudSpacer>
-                                    <MudButton Disabled="QuestionIsAcknowledged(student)"
-                                               OnClick="() => SendAcknowledgement(student)" Color="Color.Secondary"
-                                               Variant="Variant.Filled">
-                                        @if (QuestionIsAcknowledged(student))
-                                        {
-                                            <MudText Typo="Typo.button">Acknowledged</MudText>
-                                        }
-                                        else
-                                        {
-                                            <MudText Typo="Typo.button">Acknowledge</MudText>
-                                        }
-                                    </MudButton>
-                                    <MudButton OnClick="() => SendResolve(student)" Class="ml-2" Color="Color.Primary"
-                                               Variant="Variant.Filled">Mark as
-                                        resolved
-                                    </MudButton>
-                                </MudPaper>
-                            </MudItem>
+                            <TeacherHelpRequest Student="@student"
+                                                QuestionIsAcknowledged="QuestionIsAcknowledged(student)"
+                                                OnAcknowledged="(s) => SendAcknowledgement(s)"
+                                                OnResolved="(s) => SendResolve(s)"></TeacherHelpRequest>
                         }
                     </MudGrid>
                 </MudPaper>
@@ -191,8 +141,9 @@
 else
 {
     <MudPaper Class="is-display-flex is-justify-content-center is-flex-direction-row is-align-items-center" Height="90vh">
-        <MudProgressCircular StrokeWidth="4" Size="Size.Large" Color="Color.Default" Indeterminate="true" />
-        <MudText Class="ml-3" Typo="Typo.h2"><b>Connecting...</b></MudText>
+        <MudLoading Darken="true" Loading="true" Text="Connecting...">  
+
+        </MudLoading>
     </MudPaper>
 }
 

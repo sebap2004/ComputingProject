@@ -2,6 +2,7 @@
 @using ComputingProject.Client.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @using ComputingProject.Client.Components
+@using MudExtensions
 @rendermode InteractiveWebAssembly
 @inject ISnackbar Snackbar
 @inject IClassroomService ClassroomService
@@ -107,8 +108,9 @@
 else
 {
     <MudPaper Class="is-display-flex is-justify-content-center is-flex-direction-row is-align-items-center" Height="90vh">
-        <MudProgressCircular StrokeWidth="4" Size="Size.Large" Color="Color.Default" Indeterminate="true" />
-        <MudText Class="ml-3" Typo="Typo.h2"><b>Connecting...</b></MudText>
+        <MudLoading Darken="true" Loading="true" Text="Connecting...">
+
+        </MudLoading>
     </MudPaper>
 }
 

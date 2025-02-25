@@ -1,0 +1,83 @@
+﻿@using ComputingProject.Client.Services
+@using MudExtensions
+
+<MudItem Class="@Selector" xs="12">
+    <MudPaper Class="p-2 d-flex flex-row align-center">
+        <MudGrid>
+            <MudItem sm="12" md="12" lg="6" Style="word-break: break-word">
+                <MudText><b>@question.Question</b></MudText>
+                <MudSpacer></MudSpacer>
+                <MudText Class="mr-2">@question.Answers.Count Answers</MudText>
+            </MudItem>
+
+            <MudItem sm="12" md="6"
+                     Class="is-display-flex is-justify-content-end is-align-items-center">
+                <MudButton OnClick="() => ShowQuestion(question.Id)"
+                           Color="ViewingColor"
+                           Variant="Variant.Filled">
+                    @if (SelectQuestionID == question.Id)
+                    {
+                        <MudText Typo="Typo.button">Viewing</MudText>
+                        <MudIcon Icon="@Icons.Material.Sharp.RemoveRedEye" Class="ml-2"></MudIcon>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.button">Answers</MudText>
+                    }
+                </MudButton>
+                <MudButton OnClick="() => ArchiveQuestion(question.Id)" Class="ml-2"
+                           Color="ArchiveColor" Variant="Variant.Filled">
+                    @if (question.Archived)
+                    {
+                        <MudText Class="mr-2" Align="Align.Center" Typo="Typo.button">Show
+                        </MudText>
+                        <MudIcon Icon="@Icons.Material.Outlined.Unarchive"></MudIcon>
+                    }
+                    else
+                    {
+                        <MudText Class="mr-2" Align="Align.Center" Typo="Typo.button">Hide
+                        </MudText>
+                        <MudIcon Icon="@Icons.Material.Outlined.Archive"></MudIcon>
+                    }
+                </MudButton>
+                <MudButton OnClick="() => DeleteQuestion(question.Id)" Class="ml-2"
+                           Color="Color.Error"
+                           Variant="Variant.Filled"
+                           StartIcon="@Icons.Material.Outlined.Delete">
+                    Delete
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</MudItem>
+
+
+@code
+{
+    public string Selector => question.Id;
+    public string SelectorClass => "." + question.Id;
+    
+
+    [Parameter] public Action<string> OnDelete { get; set; }
+    [Parameter] public Action<string> OnArchive { get; set; }
+    [Parameter] public Action<string> OnShow { get; set; }
+    [Parameter] public TeacherQuestion question { get; set; }
+    [Parameter] public string SelectQuestionID { get; set; }
+    [Parameter] public Color ArchiveColor { get; set; }
+    [Parameter] public Color ViewingColor { get; set; }
+
+    private void DeleteQuestion(string id)
+    {
+        OnDelete(id);
+    }
+
+    private void ArchiveQuestion(string id)
+    {
+        OnArchive(id);
+    }
+    
+    private void ShowQuestion(string id)
+    {
+        OnShow(id);
+    }
+}
