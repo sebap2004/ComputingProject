@@ -87,6 +87,7 @@ public partial class StudentView : ComponentBase
 
             await InvokeAsync(StateHasChanged);
             await ClassroomServer.GetActiveQuestions();
+            await ClassroomServer.GetClassroomState(UserName);
         }
         catch (Exception ex)
         {

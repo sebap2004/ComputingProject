@@ -83,7 +83,7 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
 
     public async Task GetActiveQuestions()
     {
-        await Clients.Group("Teacher").GetActiveQuestions(ClassroomStateService.ActiveQuestions);
+        await Clients.All.GetActiveQuestions(ClassroomStateService.ActiveQuestions);
     }
 
     public async Task SendTeacherQuestion(TeacherQuestion question)

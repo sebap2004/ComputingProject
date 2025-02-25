@@ -95,6 +95,7 @@
                                         <MudIcon Icon="@Icons.Material.Outlined.Archive"></MudIcon>
                                     }
                                 </MudButton>
+                                <MudButton Class="ml-2" Color="Color.Error" Variant="Variant.Filled" StartIcon="@Icons.Material.Outlined.Delete">Delete</MudButton>
                             </MudPaper>
                         </MudItem>
                     }
@@ -135,11 +136,14 @@
         {
             <MudText GutterBottom="true" Typo="Typo.h5"><b>Question: @SelectedQuestionObject.Question</b></MudText>
             <MudText GutterBottom="true" Typo="Typo.h6"><b>Answers:</b></MudText>
-
-            foreach (var answer in SelectedQuestionObject.Answers)
-            {
-                <MudText>@answer</MudText>
-            }
+            <MudPaper  Class="is-overflow-y-auto" Elevation="0">
+                @foreach (var answer in SelectedQuestionObject.Answers)
+                {
+                <MudPaper Elevation="0" Outlined="true" Class="p-3 mb-3">
+                    <MudText Style="text-overflow: clip">@answer</MudText>
+                </MudPaper>
+                }
+            </MudPaper>
         }
         else
         {
