@@ -84,4 +84,9 @@ public class ClassroomServerProxy : IClassroomServer
     {
         await _hubConnection.InvokeAsync("SetClassroomState", stateToChangeTo);
     }
+
+    public async Task DeleteTeacherQuestion(string questionId)
+    {
+        await _hubConnection.InvokeAsync("DeleteTeacherQuestion", questionId);
+    }
 }

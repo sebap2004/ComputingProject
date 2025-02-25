@@ -64,6 +64,19 @@ public class ClassroomStateService
         }
     }
 
+    public void DeleteTeacherQuestion(string questionId)
+    {
+        TeacherQuestion? questionToRemove = ActiveQuestions.FirstOrDefault(question => question.Id == questionId);
+        if (questionToRemove != null)
+        {
+            ActiveQuestions.Remove(questionToRemove);
+        }
+        else
+        {
+            Console.Error.WriteLine("QUESTION NOT FOUND");
+        }
+    }
+    
     public void ToggleArchivedQuestion(string questionID)
     {
         TeacherQuestion? questionToRemove = ActiveQuestions.FirstOrDefault(question => question.Id == questionID);

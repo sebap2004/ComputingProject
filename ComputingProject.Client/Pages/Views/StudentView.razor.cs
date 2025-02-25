@@ -23,8 +23,8 @@ public partial class StudentView : ComponentBase
     private Color HandUpColor => HasHandUp ? Color.Error : Color.Primary;
     
     private bool HelpRequestAcknowledged { get; set; }
-    
     public bool HasHandUp {get; set;}
+    private bool IsConnected { get; set; }
 
     private async Task AskForHelp()
     {
@@ -43,6 +43,7 @@ public partial class StudentView : ComponentBase
     
     protected override async Task OnInitializedAsync()
     {
+        IsConnected = false;
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         if (user.Identity!.IsAuthenticated)
@@ -68,6 +69,7 @@ public partial class StudentView : ComponentBase
         ClassroomService.OnResolveHelpRequest += ClassroomServiceOnOnResolveHelpRequest;
         ClassroomService.OnAcknowledgeHelpRequest += ClassroomServiceOnOnAcknowledgeHelpRequest;
         
+        
         try 
         {
             await ClassroomService.StartAsync();
@@ -84,10 +86,10 @@ public partial class StudentView : ComponentBase
             Snackbar.Clear();
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopLeft;
             Snackbar.Add("Successfully connected to classroom as " + UserName, Severity.Success);
-
-            await InvokeAsync(StateHasChanged);
             await ClassroomServer.GetActiveQuestions();
             await ClassroomServer.GetClassroomState(UserName);
+            IsConnected = true;
+            StateHasChanged();
         }
         catch (Exception ex)
         {

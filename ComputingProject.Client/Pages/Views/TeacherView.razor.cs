@@ -18,6 +18,10 @@ public partial class TeacherView : ComponentBase
     private List<Message> messages = new List<Message>();
     private string? SelectQuestionID {get; set;}
     private TeacherQuestion? SelectedQuestionObject { get; set; }
+    private List<string> AcknowledgedQuestions { get; set; } = new();
+    private bool QuestionIsAcknowledged(string questionId) => AcknowledgedQuestions.Contains(questionId);
+    private bool IsConnected { get; set; }
+    
     
     
     private MudTheme Theme = new MudTheme();
@@ -34,19 +38,24 @@ public partial class TeacherView : ComponentBase
     {
         Console.WriteLine("Acknowledging " + ID);
         await ClassroomServer.AcknowledgeHelpRequest(ID);
+        AcknowledgedQuestions.Add(ID);
+        StateHasChanged();
     }
     
     private async Task SendResolve(string ID)
     {
         Console.WriteLine("Resolving " + ID);
         await ClassroomServer.ResolveHelpRequest(ID);
+        AcknowledgedQuestions.Remove(ID);
+        StateHasChanged();
     }
     
     protected override async Task OnInitializedAsync()
     {
+        IsConnected = false;
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        if (user.Identity.IsAuthenticated)
+        if (user.Identity!.IsAuthenticated)
         {
             UserName = user.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
             UserRole = user.FindFirst(ClaimTypes.Role)?.Value ?? "No role";
@@ -82,9 +91,10 @@ public partial class TeacherView : ComponentBase
             Snackbar.Clear();
             Snackbar.Add("Joined Classroom Successfully", Severity.Success);
             await ClassroomServer.GetClassroomState(UserName);
-            StateHasChanged();
             await ClassroomServer.GetStudents();
             await ClassroomServer.GetActiveQuestions();
+            IsConnected = true;
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -96,6 +106,15 @@ public partial class TeacherView : ComponentBase
     private void ClassroomServiceOnOnReceiveActiveHelpRequests(List<string> obj)
     {
         ActiveHelpRequests = obj;
+
+        foreach (var request in AcknowledgedQuestions.ToList())
+        {
+            if (!ActiveHelpRequests.Contains(request))
+            {
+                AcknowledgedQuestions.Remove(request);
+            }
+        }
+        
         StateHasChanged();
     }
 
@@ -115,6 +134,11 @@ public partial class TeacherView : ComponentBase
         StateHasChanged();
     }
 
+    public async Task DeleteQuestion(string id)
+    {
+        await ClassroomServer.DeleteTeacherQuestion(id);
+    }
+    
     private void OnClassroomServiceOnOnReceiveStudentList(List<string> connectionList)
     {
         ConnectedStudents = connectionList;

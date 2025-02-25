@@ -45,9 +45,11 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
         if (Context.User != null)
         {
             ClassroomStateService.RemoveStudent(Context.User.Identity.Name);
+            ClassroomStateService.RemoveHelpRequest(Context.User.Identity.Name);
             if (Context.User.FindFirst(ClaimTypes.Role)?.Value == "Student")
             {
                 Clients.Group("Teacher").SendStudentLeftMessage(ClassroomStateService.ConnectedStudents);
+                Clients.Group("Teacher").GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
             }
         }
         return Task.CompletedTask;
@@ -139,5 +141,11 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
         ClassroomStateService.classroomState = stateToChangeTo;
         await Clients.All.GetClassroomState(ClassroomStateService.classroomState);
         await Clients.All.ReceiveMessage("", "Set the classroom state to " + stateToChangeTo, true);
+    }
+
+    public async Task DeleteTeacherQuestion(string questionId)
+    {
+        ClassroomStateService.DeleteTeacherQuestion(questionId);
+        await Clients.All.GetActiveQuestions(ClassroomStateService.ActiveQuestions);
     }
 }

@@ -72,4 +72,9 @@ public class MockClassroomServer : IClassroomServer
     {
         return Task.CompletedTask;
     }
+
+    public Task DeleteTeacherQuestion(string questionId)
+    {
+        return Task.CompletedTask;
+    }
 }

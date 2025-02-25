@@ -10,145 +10,190 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<MudText Align="Align.Center" Typo="Typo.h3"><b>Teacher View</b></MudText>
-<br/>
-<MudGrid>
-    <TeacherGridItem>
-        <MudText Typo="Typo.h4"><b>Manage Classroom</b></MudText>
-        <MudText GutterBottom="true" Typo="Typo.h6">Switch States</MudText>
-        <MudPaper Class="mb-3" Elevation="0">
-            <MudGrid Spacing="2">
-                <MudItem>
-                    <MudButton Variant="Variant.Filled" Color="LectureButtonColor" OnClick="SetLectureState">
-                        Lecture
-                    </MudButton>
-                </MudItem>
-                <MudItem>
-                    <MudButton Variant="Variant.Filled" Color="WorkshopButtonColor" OnClick="SetWorkshopState">
-                        Workshop
-                    </MudButton>
-                </MudItem>
-            </MudGrid>
-        </MudPaper>
-        <MudText Class="mt-3">Student List (@StudentCount joined):</MudText>
-        <MudPaper Style="@($"background:{Theme.PaletteDark.DarkDarken};")" Height="20rem" MaxHeight="20rem"
-                  Class="is-overflow-y-auto mb-2" Elevation="0">
-            <MudPaper Class="p-4" Elevation="0" Style="@($"background:{Color.Transparent};")">
-                <MudGrid Spacing="1">
-                    @foreach (string student in ConnectedStudents)
-                    {
-                        <MudItem xs="12" sm="4">
-                            <MudPaper Class="p-2">
-                                <MudText>Student @student</MudText>
-                            </MudPaper>
-                        </MudItem>
-                    }
+@if (IsConnected)
+{
+    <MudText Align="Align.Center" Typo="Typo.h3"><b>Teacher View</b></MudText>
+    <br/>
+    <MudGrid>
+        <TeacherGridItem>
+            <MudText Typo="Typo.h4"><b>Manage Classroom</b></MudText>
+            <MudText GutterBottom="true" Typo="Typo.h6">Switch States</MudText>
+            <MudPaper Class="mb-3" Elevation="0">
+                <MudGrid Spacing="2">
+                    <MudItem>
+                        <MudButton Variant="Variant.Filled" Color="LectureButtonColor" OnwClick="SetLectureState">
+                            Lecture
+                        </MudButton>
+                    </MudItem>
+                    <MudItem>
+                        <MudButton Variant="Variant.Filled" Color="WorkshopButtonColor" OnClick="SetWorkshopState">
+                            Workshop
+                        </MudButton>
+                    </MudItem>
                 </MudGrid>
             </MudPaper>
-        </MudPaper>
-        <MudButton Variant="Variant.Filled" FullWidth="false" Color="Color.Tertiary"
-                   OnClick="ClassroomServer.GetStudents">Refresh Student
-            List
-        </MudButton>
-    </TeacherGridItem>
-    <TeacherGridItem>
-        <MudText GutterBottom="true" Typo="Typo.h4"><b>Send Question</b></MudText>
-        <MudPaper Class="d-flex flex-row mb-3">
-            <MudTextField Immediate="true" OnKeyDown="EnterHandler" T="string" @bind-Value="QuestionInput"
-                          Placeholder="Ask your students a question" Label="Question" Variant="Variant.Filled"
-                          Typo="Typo.h5"></MudTextField>
-            <MudButton OnClick="SendTeacherQuestion" Variant="Variant.Filled" Color="Color.Primary" Class="ml-3">Send
-            </MudButton>
-        </MudPaper>
-        <MudText GutterBottom="true" Typo="Typo.h5"><b>Manage Questions</b></MudText>
-        <MudPaper Style="@($"background:{Theme.PaletteDark.DarkDarken};")" Height="20rem" MaxHeight="20rem"
-                  Class="is-overflow-y-auto mb-2" Elevation="0">
-            <MudPaper Class="p-4" Elevation="0" Style="@($"background:{Color.Transparent};")">
-                <MudGrid Spacing="1">
-                    @foreach (var question in ActiveQuestions)
-                    {
-                        <MudItem xs="12">
-                            <MudPaper Class="p-2 d-flex flex-row align-center">
-                                <MudText>@question.Question</MudText>
-                                <MudSpacer></MudSpacer>
-                                <MudText Class="mr-2">@question.Answers.Count Answers</MudText>
-                                <MudButton OnClick="() => ShowQuestion(question.Id)" Color="ViewingColor(SelectQuestionID == question.Id)" Variant="Variant.Filled">
-                                    @if (SelectQuestionID == question.Id)
-                                    {
-                                        <MudText Typo="Typo.button">Currently Viewing</MudText>
-                                    }
-                                    else
-                                    {
-                                        <MudText Typo="Typo.button">View Answers</MudText>
-                                    }
-                                </MudButton>
-                                <MudButton OnClick="() => ArchiveQuestion(question.Id)" Class="ml-2"
-                                           Color="ArchiveColor(question.Archived)" Variant="Variant.Filled">
-                                    @if (question.Archived)
-                                    {
-                                        <MudText Class="mr-2" Align="Align.Center" Typo="Typo.button">Show</MudText>
-                                        <MudIcon Icon="@Icons.Material.Outlined.Unarchive"></MudIcon>
-                                    }
-                                    else
-                                    {
-                                        <MudText Class="mr-2" Align="Align.Center" Typo="Typo.button">Hide</MudText>
-                                        <MudIcon Icon="@Icons.Material.Outlined.Archive"></MudIcon>
-                                    }
-                                </MudButton>
-                                <MudButton Class="ml-2" Color="Color.Error" Variant="Variant.Filled" StartIcon="@Icons.Material.Outlined.Delete">Delete</MudButton>
-                            </MudPaper>
-                        </MudItem>
-                    }
-                </MudGrid>
-            </MudPaper>
-        </MudPaper>
-        <MudButton Variant="Variant.Filled" FullWidth="true" Color="Color.Tertiary"
-                   OnClick="ClassroomServer.GetStudents">Refresh Active Questions
-        </MudButton>
-    </TeacherGridItem>
-    <TeacherGridItem>
-        <MudText GutterBottom="true" Typo="Typo.h4"><b>Manage Help Requests</b></MudText>
-        <MudText GutterBottom="true" Typo="Typo.h6">Current Active Help Requests</MudText>
-        <MudPaper Style="@($"background:{Theme.PaletteDark.DarkDarken};")" Height="35rem" MaxHeight="35rem"
-                  Class="is-overflow-y-auto mb-2" Elevation="0">
-            <MudPaper Class="p-4" Elevation="0" Style="@($"background:{Color.Transparent};")">
-                <MudGrid Spacing="1">
-                    @foreach (string student in ActiveHelpRequests)
-                    {
-                        <MudItem xs="12">
-                            <MudPaper Class="p-2 d-flex flex-row align-center">
-                                <MudText>Student @student needs help</MudText>
-                                <MudSpacer></MudSpacer>
-                                <MudButton OnClick="() => SendAcknowledgement(student)" Color="Color.Secondary" Variant="Variant.Filled">Acknowledge</MudButton>
-                                <MudButton OnClick="() => SendResolve(student)" Class="ml-2" Color="Color.Primary" Variant="Variant.Filled">Mark as
-                                    resolved
-                                </MudButton>
-                            </MudPaper>
-                        </MudItem>
-                    }
-                </MudGrid>
-            </MudPaper>
-        </MudPaper>
-    </TeacherGridItem>
-    <TeacherGridItem>
-        <MudText GutterBottom="true" Typo="Typo.h4"><b>View Question Answers</b></MudText>
-        @if (SelectedQuestionObject != null)
-        {
-            <MudText GutterBottom="true" Typo="Typo.h5"><b>Question: @SelectedQuestionObject.Question</b></MudText>
-            <MudText GutterBottom="true" Typo="Typo.h6"><b>Answers:</b></MudText>
-            <MudPaper  Class="is-overflow-y-auto" Elevation="0">
-                @foreach (var answer in SelectedQuestionObject.Answers)
-                {
-                <MudPaper Elevation="0" Outlined="true" Class="p-3 mb-3">
-                    <MudText Style="text-overflow: clip">@answer</MudText>
+            <MudText Class="mt-3">Student List (@StudentCount joined):</MudText>
+            <MudPaper Style="@($"background:{Theme.PaletteLight.DarkLighten};")" Height="20rem" MaxHeight="20rem"
+                      Class="is-overflow-y-auto mb-2" Elevation="0">
+                <MudPaper Class="p-4" Elevation="0" Style="@($"background:{Color.Transparent};")">
+                    <MudGrid Spacing="1">
+                        @foreach (string student in ConnectedStudents)
+                        {
+                            <MudItem xs="12" sm="4">
+                                <MudPaper Class="p-2">
+                                    <MudText>Student @student</MudText>
+                                </MudPaper>
+                            </MudItem>
+                        }
+                    </MudGrid>
                 </MudPaper>
-                }
             </MudPaper>
-        }
-        else
-        {
-            <MudText>No question selected.</MudText>
-        }
-    </TeacherGridItem>
-</MudGrid>
+            <MudButton Variant="Variant.Filled" FullWidth="false" Color="Color.Tertiary"
+                       OnClick="ClassroomServer.GetStudents">Refresh Student
+                List
+            </MudButton>
+        </TeacherGridItem>
+        <TeacherGridItem>
+            <MudText GutterBottom="true" Typo="Typo.h4"><b>Send Question</b></MudText>
+            <MudPaper Class="d-flex flex-row mb-3">
+                <MudTextField Immediate="true" OnKeyDown="EnterHandler" T="string" @bind-Value="QuestionInput"
+                              Placeholder="Ask your students a question" Label="Question" Variant="Variant.Filled"
+                              Typo="Typo.h5"></MudTextField>
+                <MudButton OnClick="SendTeacherQuestion" Variant="Variant.Filled" Color="Color.Primary" Class="ml-3">
+                    Send
+                </MudButton>
+            </MudPaper>
+            <MudText GutterBottom="true" Typo="Typo.h5"><b>Manage Questions</b></MudText>
+            <MudPaper Style="@($"background:{Theme.PaletteLight.DarkLighten};")" Height="20rem" MaxHeight="20rem"
+                      Class="is-overflow-y-auto mb-2" Elevation="0">
+                <MudPaper Class="p-4" Elevation="0" Style="@($"background:{Color.Transparent};")">
+                    <MudGrid Spacing="1">
+                        @foreach (var question in ActiveQuestions)
+                        {
+                            <MudItem xs="12">
+                                <MudPaper Class="p-2 d-flex flex-row align-center">
+                                    <MudGrid>
+                                        <MudItem sm="12" md="12" lg="6" Style="word-break: break-word">
+                                            <MudText><b>@question.Question</b></MudText>
+                                            <MudSpacer></MudSpacer>
+                                            <MudText Class="mr-2">@question.Answers.Count Answers</MudText>
+                                        </MudItem>
+
+                                        <MudItem sm="12" md="6"
+                                                 Class="is-display-flex is-justify-content-end is-align-items-center">
+                                            <MudButton OnClick="() => ShowQuestion(question.Id)"
+                                                       Color="ViewingColor(SelectQuestionID == question.Id)"
+                                                       Variant="Variant.Filled">
+                                                @if (SelectQuestionID == question.Id)
+                                                {
+                                                    <MudText Typo="Typo.button">Currently Viewing</MudText>
+                                                }
+                                                else
+                                                {
+                                                    <MudText Typo="Typo.button">View Answers</MudText>
+                                                }
+                                            </MudButton>
+                                            <MudButton OnClick="() => ArchiveQuestion(question.Id)" Class="ml-2"
+                                                       Color="ArchiveColor(question.Archived)" Variant="Variant.Filled">
+                                                @if (question.Archived)
+                                                {
+                                                    <MudText Class="mr-2" Align="Align.Center" Typo="Typo.button">Show
+                                                    </MudText>
+                                                    <MudIcon Icon="@Icons.Material.Outlined.Unarchive"></MudIcon>
+                                                }
+                                                else
+                                                {
+                                                    <MudText Class="mr-2" Align="Align.Center" Typo="Typo.button">Hide
+                                                    </MudText>
+                                                    <MudIcon Icon="@Icons.Material.Outlined.Archive"></MudIcon>
+                                                }
+                                            </MudButton>
+                                            <MudButton OnClick="() => DeleteQuestion(question.Id)" Class="ml-2"
+                                                       Color="Color.Error"
+                                                       Variant="Variant.Filled"
+                                                       StartIcon="@Icons.Material.Outlined.Delete">
+                                                Delete
+                                            </MudButton>
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudPaper>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudPaper>
+            </MudPaper>
+            <MudButton Variant="Variant.Filled" FullWidth="true" Color="Color.Tertiary"
+                       OnClick="ClassroomServer.GetStudents">Refresh Active Questions
+            </MudButton>
+        </TeacherGridItem>
+        <TeacherGridItem>
+            <MudText GutterBottom="true" Typo="Typo.h4"><b>Manage Help Requests</b></MudText>
+            <MudText GutterBottom="true" Typo="Typo.h6">Current Active Help Requests</MudText>
+            <MudPaper Style="@($"background:{Theme.PaletteLight.DarkLighten};")" Height="35rem" MaxHeight="35rem"
+                      Class="is-overflow-y-auto mb-2" Elevation="0">
+                <MudPaper Class="p-4" Elevation="0" Style="@($"background:{Color.Transparent};")">
+                    <MudGrid Spacing="1">
+                        @foreach (string student in ActiveHelpRequests)
+                        {
+                            <MudItem xs="12">
+                                <MudPaper Class="p-2 d-flex flex-row align-center">
+                                    <MudText>Student @student needs help</MudText>
+                                    <MudSpacer></MudSpacer>
+                                    <MudButton Disabled="QuestionIsAcknowledged(student)"
+                                               OnClick="() => SendAcknowledgement(student)" Color="Color.Secondary"
+                                               Variant="Variant.Filled">
+                                        @if (QuestionIsAcknowledged(student))
+                                        {
+                                            <MudText Typo="Typo.button">Acknowledged</MudText>
+                                        }
+                                        else
+                                        {
+                                            <MudText Typo="Typo.button">Acknowledge</MudText>
+                                        }
+                                    </MudButton>
+                                    <MudButton OnClick="() => SendResolve(student)" Class="ml-2" Color="Color.Primary"
+                                               Variant="Variant.Filled">Mark as
+                                        resolved
+                                    </MudButton>
+                                </MudPaper>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudPaper>
+            </MudPaper>
+        </TeacherGridItem>
+        <TeacherGridItem>
+            <MudText GutterBottom="true" Typo="Typo.h4"><b>View Question Answers</b></MudText>
+            @if (SelectedQuestionObject != null)
+            {
+                <MudText GutterBottom="true" Typo="Typo.h5"><b>Question: @SelectedQuestionObject.Question</b></MudText>
+                <MudText GutterBottom="true" Typo="Typo.h6"><b>Answers:</b></MudText>
+                <MudPaper Class="is-overflow-y-auto" Elevation="0">
+
+                    @foreach (var answer in SelectedQuestionObject.Answers)
+                    {
+                        <MudChat ChatPosition="ChatBubblePosition.Start">
+                            <MudChatBubble>
+                                @answer
+                            </MudChatBubble>
+                        </MudChat>
+                    }
+
+                </MudPaper>
+            }
+            else
+            {
+                <MudText>No question selected.</MudText>
+            }
+        </TeacherGridItem>
+    </MudGrid>
+}
+else
+{
+    <MudPaper Class="is-display-flex is-justify-content-center is-flex-direction-row is-align-items-center" Height="90vh">
+        <MudProgressCircular StrokeWidth="4" Size="Size.Large" Color="Color.Default" Indeterminate="true" />
+        <MudText Class="ml-3" Typo="Typo.h2"><b>Connecting...</b></MudText>
+    </MudPaper>
+}
+
 

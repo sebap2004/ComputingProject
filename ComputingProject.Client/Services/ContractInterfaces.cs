@@ -34,8 +34,7 @@ public interface IClassroomServer {
     Task ResolveHelpRequest(string requestID);
     Task ArchiveTeacherQuestion(string questionID);
     Task SetClassroomState(ClassroomState stateToChangeTo);
-    
-    //TODO: add deletion of questions
+    Task DeleteTeacherQuestion(string questionId);
 }
 
 // Client Side Events
