@@ -105,6 +105,7 @@ public partial class StudentView : ComponentBase
     private void ClassroomServiceOnOnResolveHelpRequest()
     {
         Console.WriteLine("Resolve Help Request");
+        Snackbar.Add("Your question has been answered!", Severity.Success);
         HelpRequestAcknowledged = false;
         HasHandUp = false;
         StateHasChanged();

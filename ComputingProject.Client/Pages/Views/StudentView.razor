@@ -50,9 +50,10 @@
         }
     </StudentGridItem>
     <StudentGridItem>
-        @if (CurrentClassroomState != ClassroomState.Workshop)
+        @if (CurrentClassroomState == ClassroomState.Workshop)
         {
-            <MudTextField T="string" Lines="32"  FullWidth="true" Label="Notes" Placeholder="Just write anything here" Variant="Variant.Filled"></MudTextField>
+            <MudTextField T="string" Lines="25"  FullWidth="true" Label="Notes" Placeholder="Just write anything here" Variant="Variant.Filled"></MudTextField>
+            <MudText GutterBottom="true" Class="mb-3" Typo="Typo.h5"><b>Ask teacher for help</b></MudText>
             <MudPaper Class="d-flex is-align-items-center" Height="20%" Elevation="0">
                 <MudPaper Class="d-flex is-align-items-center" Elevation="0">
                     @if (HasHandUp)
@@ -79,6 +80,10 @@
                     }
                 </MudButton>
             </MudPaper>
+        }
+        else
+        {
+            <MudText>Locked in Lecture Mode.</MudText>
         }
     </StudentGridItem>
 </MudGrid>
