@@ -21,7 +21,7 @@
             <MudPaper Class="mb-3" Elevation="0">
                 <MudGrid Spacing="2">
                     <MudItem>
-                        <MudButton Variant="Variant.Filled" Color="LectureButtonColor" OnwClick="SetLectureState">
+                        <MudButton Variant="Variant.Filled" Color="LectureButtonColor" OnClick="SetLectureState">
                             Lecture
                         </MudButton>
                     </MudItem>
@@ -86,7 +86,7 @@
                                                        Variant="Variant.Filled">
                                                 @if (SelectQuestionID == question.Id)
                                                 {
-                                                    <MudText Typo="Typo.button">Currently Viewing</MudText>
+                                                    <MudText Typo="Typo.button">Viewing</MudText>
                                                 }
                                                 else
                                                 {

@@ -11,14 +11,14 @@ namespace ComputingProject.Client.Pages.Views;
 public partial class StudentView : ComponentBase
 {
     ClassroomState CurrentClassroomState;
-    public List<TeacherQuestion> ActiveQuestions { get; set; } = new ();
+    private List<TeacherQuestion> ActiveQuestions { get; set; } = new ();
     private string MessageInput;
     private MudTheme Theme = new MudTheme();
     private string UserName { get; set; }
     private string UserRole { get; set; }
     private List<string> QuestionIDs = new();
     private Dictionary<string, string> Answers = new();
-
+    private string NotepadInput {get;set;}
     private string HandUpIcon => HasHandUp ? Icons.Material.Filled.Cancel : Icons.Material.Filled.FrontHand;
     private Color HandUpColor => HasHandUp ? Color.Error : Color.Primary;
     
