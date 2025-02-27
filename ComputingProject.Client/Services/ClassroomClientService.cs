@@ -28,7 +28,6 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
     public ClassroomClientService(HubConnection hubConnection)
     {
         _hubConnection = hubConnection;
-        _hubConnection.On<string, string, bool>("ReceiveMessage", GetMessage);
         _hubConnection.On<ClassroomState>("GetClassroomState", GetClassroomState);
         _hubConnection.On<List<String>>("SendStudentJoinedMessage", GetStudentJoinedMessage);
         _hubConnection.On<List<String>>("SendStudentLeftMessage", GetStudentLeftMessage);
@@ -36,8 +35,8 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
         _hubConnection.On<List<String>>("GetActiveHelpRequests", GetActiveHelpRequests);
         _hubConnection.On<List<TeacherQuestion>>("GetActiveQuestions", GetActiveQuestions);
         _hubConnection.On<string>("ArchiveTeacherQuestion", ArchiveTeacherMethods);
-        _hubConnection.On("ReceiveAcknowledgementForHelpRequest", AcknowledgeHelpRequest);
-        _hubConnection.On("ReceiveResolutionForHelpRequest", ResolveHelpRequest);
+        _hubConnection.On("GetAcknowledgementForHelpRequest", AcknowledgeHelpRequest);
+        _hubConnection.On("GetResolutionForHelpRequest", ResolveHelpRequest);
         _hubConnection.On<string, string>("AnswerTeacherQuestion", AnswerTeacherQuestion);
         _hubConnection.On<List<TeacherAnnouncement>>("GetAnnouncements", GetAnnouncements);
         _hubConnection.On<string>("GetCurrentTask", GetCurrentTask);

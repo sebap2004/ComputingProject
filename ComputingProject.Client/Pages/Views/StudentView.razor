@@ -63,18 +63,18 @@
             }
         </StudentGridItem>
         <StudentGridItem>
-            <MudPaper Height="75%" Elevation="0">
+            <MudPaper Class="d-flex is-flex-direction-column" Height="100%" Elevation="0">
                 @if (string.IsNullOrWhiteSpace(CurrentTask))
                 {
-                    <MudText Align="Align.Center" Typo="Typo.h3">No task assigned yet.</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h4">No task assigned yet.</MudText>
                 }
                 else
                 {
-                    <MudText Align="Align.Center" Typo="Typo.h3">Current Task: @CurrentTask</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h4">Current Task: @CurrentTask</MudText>
                 }
                 <hr style="@($"background-color:{Theme.PaletteDark.GrayDark};")"/>
-                <MudText Typo="Typo.h4" GutterBottom="true"><b>Teacher Announcements:</b></MudText>
-                <MudPaper Height="77%"
+                <MudText Typo="Typo.h5" GutterBottom="true"><b>Teacher Announcements:</b></MudText>
+                <MudPaper Height="60%"
                           Class="is-overflow-y-auto p-2"
                           Style="@($"background:{Theme.PaletteLight.DarkLighten};")">
                     @foreach (var announcement in Announcements)
@@ -84,52 +84,51 @@
                             continue;
                         }
 
-                        <MudPaper Class="p-4 mb-2" MinHeight="10rem">
-                            <MudText Typo="Typo.h4">
+                        <MudPaper Class="p-4 mb-2">
+                            <MudText Typo="Typo.h5">
                                 <b>@announcement.AnnouncementText</b>
                             </MudText>
                             <br/>
                         </MudPaper>
                     }
                 </MudPaper>
-            </MudPaper>
-            @if (CurrentClassroomState == ClassroomState.Workshop)
-            {
-                <MudText GutterBottom="true" Class="mb-3" Typo="Typo.h5"><b>Ask teacher for help</b></MudText>
-                <MudPaper Class="d-flex is-align-items-center" Height="20%" Elevation="0">
-
-                    @if (HasHandUp)
-                    {
-                        <MudPaper Width="80%" Class="d-flex is-align-items-center" Elevation="0">
-                            @if (HelpRequestAcknowledged)
+                <MudSpacer></MudSpacer>
+                @if (CurrentClassroomState == ClassroomState.Workshop)
+                {
+                    <MudPaper Height="20%" Elevation="0" Class="mt-2 d-flex is-display-flex flex-column">
+                        <MudText GutterBottom="true" Class="mb-3" Typo="Typo.h5"><b>Ask teacher for help</b></MudText>
+                        <MudPaper Class="d-flex flex-column is-align-items-center is-flex-grow-1" Elevation="0">
+                            <MudButton FullWidth="true" OnClick="AskForHelp" Variant="Variant.Filled" Color="HandUpColor"
+                                       EndIcon="@HandUpIcon"
+                                       Style="height: 100%;">
+                                @if (HasHandUp)
+                                {
+                                    <MudText Typo="Typo.button">Cancel</MudText>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.button">Ask For Help</MudText>
+                                }
+                            </MudButton>
+                            @if (HasHandUp)
                             {
-                                <MudText Typo="Typo.h5">The teacher has acknowledged your help request and is coming
-                                    your way soon!
-                                </MudText>
-                            }
-                            else
-                            {
-                                <MudText Typo="Typo.h5">Your hand is up! Waiting for teacher acknowledgement...
-                                </MudText>
+                                <MudPaper Width="100%" Class="d-flex is-justify-content-center mt-4 is-align-items-center" Elevation="0">
+                                    @if (HelpRequestAcknowledged)
+                                    {
+                                        <MudText Align="Align.Center" Typo="Typo.h5">The teacher acknowledged your request and is on the way!
+                                        </MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText Align="Align.Center" Typo="Typo.h5">Your hand is up! Waiting for teacher acknowledgement...
+                                        </MudText>
+                                    }
+                                </MudPaper>
                             }
                         </MudPaper>
-                    }
-
-                    <MudSpacer></MudSpacer>
-                    <MudButton FullWidth="true" OnClick="AskForHelp" Variant="Variant.Filled" Color="HandUpColor"
-                               EndIcon="@HandUpIcon"
-                               Style="height: 10rem;">
-                        @if (HasHandUp)
-                        {
-                            <MudText Typo="Typo.button">Cancel</MudText>
-                        }
-                        else
-                        {
-                            <MudText Typo="Typo.button">Ask For Help</MudText>
-                        }
-                    </MudButton>
-                </MudPaper>
-            }
+                    </MudPaper>
+                }
+            </MudPaper>
         </StudentGridItem>
     </MudGrid>
 }
