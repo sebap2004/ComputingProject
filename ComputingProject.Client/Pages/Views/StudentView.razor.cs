@@ -12,6 +12,8 @@ public partial class StudentView : ComponentBase
 {
     ClassroomState CurrentClassroomState;
     private List<TeacherQuestion> ActiveQuestions { get; set; } = new ();
+    public List<TeacherAnnouncement> Announcements { get; set; } = new ();
+    public string CurrentTask { get; set; }
     private string MessageInput;
     private MudTheme Theme = new MudTheme();
     private string UserName { get; set; }
@@ -68,7 +70,8 @@ public partial class StudentView : ComponentBase
         ClassroomService.OnReceiveActiveQuestions += ReceiveActiveQuestions;
         ClassroomService.OnResolveHelpRequest += ClassroomServiceOnOnResolveHelpRequest;
         ClassroomService.OnAcknowledgeHelpRequest += ClassroomServiceOnOnAcknowledgeHelpRequest;
-        
+        ClassroomService.OnReceiveAnnouncements += ClassroomServiceOnOnReceiveAnnouncements;
+        ClassroomService.OnReceiveCurrentTask += ClassroomServiceOnOnReceiveCurrentTask;
         
         try 
         {
@@ -96,6 +99,18 @@ public partial class StudentView : ComponentBase
             // Handle connection errors
             Snackbar.Add("Failed to connect to classroom: " + ex.Message, Severity.Error);
         }
+    }
+    
+    private void ClassroomServiceOnOnReceiveCurrentTask(string obj)
+    {
+        CurrentTask = obj;
+        StateHasChanged();
+    }
+
+    private void ClassroomServiceOnOnReceiveAnnouncements(List<TeacherAnnouncement> obj)
+    {
+        Announcements = obj;
+        StateHasChanged();
     }
 
     private void ClassroomServiceOnOnAcknowledgeHelpRequest()

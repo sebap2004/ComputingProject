@@ -13,7 +13,7 @@ public class MockClassroomClient : IClassroomClient
     public event Action<string, string, bool> OnMessageReceived; // No-op event
     public Task StartAsync() => Task.CompletedTask;
     public Task StopAsync() => Task.CompletedTask;
-    public Task ReceiveMessage(string sender, string content, bool systemMessage) => Task.CompletedTask;
+    public Task GetMessage(string sender, string content, bool systemMessage) => Task.CompletedTask;
     public Task GetClassroomState(ClassroomState classroomState)
     {
         return Task.CompletedTask;
@@ -36,23 +36,33 @@ public class MockClassroomClient : IClassroomClient
         
     }
 
-    public Task SendStudentJoinedMessage(List<string> Users)
+    public Task GetAnnouncements(List<TeacherAnnouncement> announcements)
     {
         return Task.CompletedTask;
     }
 
-    public Task SendStudentLeftMessage(List<string> Users)
+    public Task GetCurrentTask(string task)
     {
         return Task.CompletedTask;
     }
 
-    public Task ReceiveAcknowledgementForHelpRequest()
+    public Task GetStudentJoinedMessage(List<string> Users)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task GetStudentLeftMessage(List<string> Users)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task GetAcknowledgementForHelpRequest()
     {
         return Task.CompletedTask;
         
     }
 
-    public Task ReceiveResolutionForHelpRequest()
+    public Task GetResolutionForHelpRequest()
     {
         return Task.CompletedTask;
         

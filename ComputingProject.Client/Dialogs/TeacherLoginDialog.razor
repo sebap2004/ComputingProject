@@ -13,7 +13,7 @@
             <DataAnnotationsValidator/>
             <MudCard Elevation="0" Style="width: 30rem" >
                 <MudCardContent Class="pt-0">
-                    <MudTextField Label="Password" HelperText="Ask the project leader if you've forgotten" Class="mt-3"
+                    <MudTextField Required="true" RequiredError="Answer is required." Error="Error" ErrorText="Incorrect Password." Label="Password" HelperText="Ask the project leader if you've forgotten" Class="mt-3"
                                   @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" InputType="InputType.Password"/>
                 </MudCardContent>
                 <MudCardActions>
@@ -31,6 +31,8 @@
     
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
     
+    private bool Error { get; set; }
+    
     private void Cancel() => MudDialog.Cancel();
     
     private async Task HandleLogin()
@@ -44,10 +46,12 @@
             {
                 customProvider.NotifyAuthenticationStateChanged();
                 Navigation.NavigateTo("/teacher");
+                Error = false;
             }
         }
         else
         {
+            Error = true;
         }
     }
 }

@@ -65,11 +65,12 @@
                 customProvider.NotifyAuthenticationStateChanged();
                 Navigation.NavigateTo("/");
                 await ClassroomService.StopAsync();
+                Snackbar.Add("Logged out successfully.", Severity.Success);
             }
         }
         else
         {
-            Snackbar.Add("Error logging out");
+            Snackbar.Add("Error logging out", Severity.Error);
         }
     }
 

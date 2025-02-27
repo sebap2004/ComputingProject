@@ -25,7 +25,7 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
             {
                 ClassroomStateService.AddStudent(Context.User.Identity.Name);
                 Groups.AddToGroupAsync(Context.ConnectionId, "Student");
-                Clients.Group("Teacher").SendStudentJoinedMessage(ClassroomStateService.ConnectedStudents);
+                Clients.Group("Teacher").GetStudentJoinedMessage(ClassroomStateService.ConnectedStudents);
                 Console.WriteLine("sent student joined teacher");
             }
             if (Role  == "Teacher")
@@ -48,7 +48,7 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
             ClassroomStateService.RemoveHelpRequest(Context.User.Identity.Name);
             if (Context.User.FindFirst(ClaimTypes.Role)?.Value == "Student")
             {
-                Clients.Group("Teacher").SendStudentLeftMessage(ClassroomStateService.ConnectedStudents);
+                Clients.Group("Teacher").GetStudentLeftMessage(ClassroomStateService.ConnectedStudents);
                 Clients.Group("Teacher").GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
             }
         }
@@ -57,13 +57,13 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
 
     public async Task SendMessage(string sender, string content, bool systemMessage)
     {
-        await Clients.All.ReceiveMessage(sender, content, systemMessage);
+        await Clients.All.GetMessage(sender, content, systemMessage);
     }
     
     public async Task SendMessageToTeacher(string sender, string content, bool systemMessage)
     {
-        await Clients.User("Teacher").ReceiveMessage(sender + " - TEACHER ONLY", content, systemMessage);
-        await Clients.User(sender).ReceiveMessage(sender, content, systemMessage);
+        await Clients.User("Teacher").GetMessage(sender + " - TEACHER ONLY", content, systemMessage);
+        await Clients.User(sender).GetMessage(sender, content, systemMessage);
     }
 
     public async Task GetClassroomState(string UserName)
@@ -86,6 +86,16 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
     public async Task GetActiveQuestions()
     {
         await Clients.All.GetActiveQuestions(ClassroomStateService.ActiveQuestions);
+    }
+
+    public async Task GetCurrentTask()
+    {
+        await Clients.All.GetCurrentTask(ClassroomStateService.CurrentTask);
+    }
+
+    public async Task GetAnnouncements()
+    {
+        await Clients.All.GetAnnouncements(ClassroomStateService.TeacherAnnouncements);
     }
 
     public async Task SendTeacherQuestion(TeacherQuestion question)
@@ -117,7 +127,7 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
 
     public async Task AcknowledgeHelpRequest(string requestID)
     {
-        await Clients.Group("Student").ReceiveAcknowledgementForHelpRequest();
+        await Clients.User(requestID).GetAcknowledgementForHelpRequest();
         await Clients.Group("Teacher").GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
         Console.WriteLine("Sending acknowledgement to " + requestID);
     }
@@ -126,7 +136,7 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
     {
         ClassroomStateService.RemoveHelpRequest(requestID);
         Console.WriteLine("Sending resolution to " + requestID);
-        await Clients.Group("Student").ReceiveResolutionForHelpRequest();        
+        await Clients.User(requestID).GetResolutionForHelpRequest();        
         await Clients.Group("Teacher").GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
     }
 
@@ -140,12 +150,36 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
     {
         ClassroomStateService.classroomState = stateToChangeTo;
         await Clients.All.GetClassroomState(ClassroomStateService.classroomState);
-        await Clients.All.ReceiveMessage("", "Set the classroom state to " + stateToChangeTo, true);
+        await Clients.All.GetMessage("", "Set the classroom state to " + stateToChangeTo, true);
     }
 
     public async Task DeleteTeacherQuestion(string questionId)
     {
         ClassroomStateService.DeleteTeacherQuestion(questionId);
         await Clients.All.GetActiveQuestions(ClassroomStateService.ActiveQuestions);
+    }
+
+    public async Task AddAnnouncement(TeacherAnnouncement announcement)
+    {
+        ClassroomStateService.AddTeacherAnnouncement(announcement);
+        await Clients.All.GetAnnouncements(ClassroomStateService.TeacherAnnouncements);
+    }
+
+    public async Task RemoveAnnouncement(string announcementId)
+    {
+        ClassroomStateService.RemoveTeacherAnnouncement(announcementId);
+        await Clients.All.GetAnnouncements(ClassroomStateService.TeacherAnnouncements);
+    }
+
+    public async Task ToggleHideAnnouncement(string announcementId)
+    {
+        ClassroomStateService.ToggleHideTeacherAnnouncement(announcementId);
+        await Clients.All.GetAnnouncements(ClassroomStateService.TeacherAnnouncements);
+    }
+
+    public async Task SetCurrentTask(string task)
+    {
+        ClassroomStateService.SetCurrentTask(task);
+        await Clients.All.GetCurrentTask(ClassroomStateService.CurrentTask);
     }
 }

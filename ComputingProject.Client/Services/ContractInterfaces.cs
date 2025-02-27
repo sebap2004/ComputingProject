@@ -9,15 +9,17 @@ namespace ComputingProject.Client.Services;
 // Responding to Server Messages
 public interface IClassroomClient
 {
-    Task ReceiveMessage(string sender, string content, bool systemMessage);
+    Task GetMessage(string sender, string content, bool systemMessage);
     Task GetClassroomState(ClassroomState classroomState);
     Task GetStudents(List<string> students);
     Task GetActiveHelpRequests(List<string> students);
     Task GetActiveQuestions(List<TeacherQuestion> questions);
-    Task SendStudentJoinedMessage(List<String> Users);
-    Task SendStudentLeftMessage(List<String> Users);
-    Task ReceiveAcknowledgementForHelpRequest();
-    Task ReceiveResolutionForHelpRequest();
+    Task GetAnnouncements(List<TeacherAnnouncement> announcements);
+    Task GetCurrentTask(string task);
+    Task GetStudentJoinedMessage(List<String> Users);
+    Task GetStudentLeftMessage(List<String> Users);
+    Task GetAcknowledgementForHelpRequest();
+    Task GetResolutionForHelpRequest();
     Task AnswerTeacherQuestion(string questionID, string answer);
 }
 
@@ -30,6 +32,8 @@ public interface IClassroomServer {
     Task GetStudents();
     Task GetActiveHelpRequests();
     Task GetActiveQuestions();
+    Task GetCurrentTask();
+    Task GetAnnouncements();
     Task SendTeacherQuestion(TeacherQuestion question);
     Task AnswerTeacherQuestion(string studentID, string questionID, string answer);
     Task SendHelpRequest(string requestID);
@@ -39,6 +43,10 @@ public interface IClassroomServer {
     Task ArchiveTeacherQuestion(string questionID);
     Task SetClassroomState(ClassroomState stateToChangeTo);
     Task DeleteTeacherQuestion(string questionId);
+    Task AddAnnouncement(TeacherAnnouncement announcement);
+    Task RemoveAnnouncement(string announcementId);
+    Task ToggleHideAnnouncement(string announcementId);
+    Task SetCurrentTask(string task);
 }
 
 // Client Side Events
@@ -52,6 +60,8 @@ public interface IClassroomService
     event Action<List<String>> OnReceiveStudentList;
     event Action<List<String>> OnReceiveActiveHelpRequests;
     event Action<List<TeacherQuestion>> OnReceiveActiveQuestions;
+    event Action<List<TeacherAnnouncement>> OnReceiveAnnouncements;
+    event Action<string> OnReceiveCurrentTask;
     event Action<string> OnArchiveTeacherQuestion;
     event Action OnAcknowledgeHelpRequest;
     event Action OnResolveHelpRequest;
@@ -71,18 +81,18 @@ public class TeacherQuestion
         return Answers.Any(q => q == studentID);
     }
     
-    public TeacherQuestion(string id, string question)
+    public TeacherQuestion(string id, string questionText)
     {
         Id = id;
-        Question = question;
+        QuestionText = questionText;
         Answers = new();
         Archived = false;
     }
 
-    public TeacherQuestion(string id, string question, List<string> answers, bool archived)
+    public TeacherQuestion(string id, string questionText, List<string> answers, bool archived)
     {
         Id = id;
-        Question = question;
+        QuestionText = questionText;
         Answers = answers;
         Archived = archived;
     }
@@ -90,9 +100,37 @@ public class TeacherQuestion
     public string Id { get; set; }
 
     // Question text that the teacher asked
-    public string Question { get; set; }
+    public string QuestionText { get; set; }
 
     // Student's answers
     public List<string> Answers { get; set; } 
     public bool Archived { get; set; }
 }
+
+public class TeacherAnnouncement
+{
+    public TeacherAnnouncement() {}
+    
+    public TeacherAnnouncement(string id, string announcementText)
+    {
+        Id = id;
+        AnnouncementText = announcementText;
+        Archived = false;
+    }
+
+    public TeacherAnnouncement(string id, string announcementText, bool archived)
+    {
+        Id = id;
+        AnnouncementText = announcementText;
+        Archived = archived;
+    }
+    
+    public required string Id { get; set; }
+
+    // Announcement
+    public required string AnnouncementText { get; set; }
+    
+    // Hidden or not.
+    public bool Archived { get; set; }
+}
+

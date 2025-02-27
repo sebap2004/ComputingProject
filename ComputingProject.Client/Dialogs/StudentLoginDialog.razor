@@ -12,9 +12,9 @@
             <DataAnnotationsValidator/>
             <MudCard Elevation="0" Style="width: 30rem" >
                 <MudCardContent Class="pt-0">
-                    <MudTextField InputType="InputType.Number" MaxLength="2" Label="ID" HelperText="Max. 2 characters"
+                    <MudTextField Required="true" RequiredError="Answer is required." InputType="InputType.Number" MaxLength="2" Label="ID" HelperText="Max. 2 characters"
                                   @bind-Value="loginModel.Username" For="@(() => loginModel.Username)"/>
-                    <MudTextField Label="Password" HelperText="Ask the project leader if you've forgotten" Class="mt-3"
+                    <MudTextField Required="true" RequiredError="Answer is required." Error="Error" ErrorText="Incorrect Password." Label="Password" HelperText="Ask the project leader if you've forgotten" Class="mt-3"
                                   @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" InputType="InputType.Password"/>
                 </MudCardContent>
                 <MudCardActions>
@@ -34,6 +34,8 @@
     
     private void Cancel() => MudDialog.Cancel();
     
+    private bool Error { get; set; }
+    
     private async Task HandleLogin()
     {
         loginModel.IsTeacher = false;
@@ -44,10 +46,12 @@
             {
                 customProvider.NotifyAuthenticationStateChanged();
                 Navigation.NavigateTo("/student");
+                Error = false;
             }
         }
         else
         {
+            Error = true;
         }
     }
 }

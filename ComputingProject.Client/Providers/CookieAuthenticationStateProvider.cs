@@ -15,11 +15,9 @@ public class CookieAuthenticationStateProvider : AuthenticationStateProvider
     {
         try
         {
-            // Call the API to check if the user is authenticated
             var response = await _httpClient.GetAsync("api/auth/user");
             if (response.IsSuccessStatusCode)
             {
-                // Deserialize the claims (adjust based on your API response)
                 var claims = await response.Content.ReadFromJsonAsync<List<ClaimDto>>();
                 var identity = new ClaimsIdentity(
                     claims?.Select(c => new Claim(c.Type, c.Value)),
@@ -31,9 +29,9 @@ public class CookieAuthenticationStateProvider : AuthenticationStateProvider
         }
         catch
         {
-            // Handle network errors gracefully
+            // ignored
         }
-        // Return unauthenticated state if the API call fails or returns 401
+
         return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
     }
 

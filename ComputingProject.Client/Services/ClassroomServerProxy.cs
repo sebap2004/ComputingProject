@@ -44,9 +44,19 @@ public class ClassroomServerProxy : IClassroomServer
         await _hubConnection.InvokeAsync("GetActiveQuestions");
     }
 
+    public async Task GetCurrentTask()
+    {
+        await _hubConnection.InvokeAsync("GetCurrentTask");
+    }
+
+    public async Task GetAnnouncements()
+    {
+        await _hubConnection.InvokeAsync("GetAnnouncements");
+    }
+
     public async Task SendTeacherQuestion(TeacherQuestion question)
     {
-        Console.WriteLine("Sending tq message to hub: " + question.Question + " - " + question.Archived);
+        Console.WriteLine("Sending tq message to hub: " + question.QuestionText + " - " + question.Archived);
         await _hubConnection.InvokeAsync("SendTeacherQuestion", question);
     }
 
@@ -88,5 +98,25 @@ public class ClassroomServerProxy : IClassroomServer
     public async Task DeleteTeacherQuestion(string questionId)
     {
         await _hubConnection.InvokeAsync("DeleteTeacherQuestion", questionId);
+    }
+
+    public async Task AddAnnouncement(TeacherAnnouncement announcement)
+    {
+        await _hubConnection.InvokeAsync("AddAnnouncement", announcement);
+    }
+
+    public async Task RemoveAnnouncement(string announcementId)
+    {
+        await _hubConnection.InvokeAsync("RemoveAnnouncement", announcementId);
+    }
+
+    public async Task ToggleHideAnnouncement(string announcementId)
+    {
+        await _hubConnection.InvokeAsync("ToggleHideAnnouncement", announcementId);
+    }
+
+    public async Task SetCurrentTask(string task)
+    {
+        await _hubConnection.InvokeAsync("SetCurrentTask", task);
     }
 }

@@ -1,43 +1,17 @@
 {
   "$schema": "https://json.schemastore.org/launchsettings.json",
-    "profiles": {
-      "http": {
-        "commandName": "Project",
-        "dotnetRunMessages": true,
-        "launchBrowser": true,
-        "hotReloadEnabled": true,
-        "watchStaticFiles": true,
-        "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
-        "applicationUrl": "http://localhost:5262",
-        "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
-        }
+  "profiles": {
+    "Hot Reload": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:6362",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "https": {
-        "commandName": "Project",
-        "dotnetRunMessages": true,
-        "launchBrowser": true,
-        "hotReloadEnabled": true,
-        "watchStaticFiles": true,
-        "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
-        "applicationUrl": "https://localhost:7297;http://localhost:5262",
-        "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
-        }
-      },
-      "Hot Reload": {
-        "commandName": "Executable",
-        "executablePath": "dotnet",
-        "workingDirectory": "$(ProjectDir)",
-        "hotReloadEnabled": true,
-        "hotReloadProfile": "aspnetcore",
-        "watchStaticFiles": true,
-        "commandLineArgs": "watch run",
-        "launchBrowser": true,
-        "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
-        },
-        "applicationUrl": "https://localhost:3251;http://localhost:6362"
-      }
+      "hotReloadEnabled": true,
+      "hotReloadProfile": "aspnetcore",
+      "workingDirectory": "$(ProjectDir)"
     }
   }
+}
+

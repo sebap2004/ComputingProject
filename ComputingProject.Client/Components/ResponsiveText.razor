@@ -1,0 +1,23 @@
+﻿<MudText Class="d-flex d-sm-none" Typo="@TypoXs">@ChildContent</MudText>
+<MudText Class="d-none d-sm-flex d-md-none" Typo="@TypoSm">@ChildContent</MudText>
+<MudText Class="d-none d-md-flex d-lg-none" Typo="@TypoMd">@ChildContent</MudText>
+<MudText Class="d-none d-lg-flex d-xl-none" Typo="@TypoLg">@ChildContent</MudText>
+<MudText Class="d-none d-xl-flex d-xxl-none" Typo="@TypoXl">@ChildContent</MudText>
+<MudText Class="d-none d-xxl-flex" Typo="@TypoXxl">@ChildContent</MudText>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    [Parameter]
+    public Typo TypoXs { get; set; } = Typo.caption;
+    [Parameter]
+    public Typo TypoSm { get; set; } = Typo.body1;
+    [Parameter]
+    public Typo TypoMd { get; set; } = Typo.h6;
+    [Parameter]
+    public Typo TypoLg { get; set; } = Typo.h4; 
+    [Parameter]
+    public Typo TypoXl { get; set; } = Typo.h2;
+    [Parameter]
+    public Typo TypoXxl { get; set; } = Typo.h1;
+}
