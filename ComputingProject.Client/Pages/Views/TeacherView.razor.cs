@@ -110,7 +110,7 @@ public partial class TeacherView : ComponentBase
             {
                 NavigationManager.NavigateTo($"/access-denied/{Uri.EscapeDataString($"incorrectrole")}");
             }
-            _ = ConnectToHub();
+            await ConnectToHub();
         }
         else
         {

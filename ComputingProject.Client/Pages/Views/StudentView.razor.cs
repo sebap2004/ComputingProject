@@ -56,7 +56,7 @@ public partial class StudentView : ComponentBase
             {
                 NavigationManager.NavigateTo($"/access-denied/{Uri.EscapeDataString($"incorrectrole")}");
             }
-            _ = ConnectToHub();
+            await ConnectToHub();
         }
         else
         {
@@ -91,6 +91,8 @@ public partial class StudentView : ComponentBase
             Snackbar.Add("Successfully connected to classroom as " + UserName, Severity.Success);
             await ClassroomServer.GetActiveQuestions();
             await ClassroomServer.GetClassroomState(UserName);
+            await ClassroomServer.GetCurrentTask();
+            await ClassroomServer.GetAnnouncements();
             IsConnected = true;
             StateHasChanged();
         }
