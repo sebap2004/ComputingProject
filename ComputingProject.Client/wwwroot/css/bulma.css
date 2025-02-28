@@ -2963,12 +2963,6 @@ pre {
   font-family: var(--bulma-code-family);
 }
 
-body {
-  color: var(--bulma-body-color);
-  font-size: var(--bulma-body-font-size);
-  font-weight: var(--bulma-body-weight);
-  line-height: var(--bulma-body-line-height);
-}
 
 a,
 button {
@@ -13650,7 +13644,7 @@ label.panel-block:hover {
   flex-shrink: 0;
 }
 
-.hero-body {
+.hero-body{
   flex-grow: 1;
   flex-shrink: 0;
   padding: var(--bulma-hero-body-padding);
