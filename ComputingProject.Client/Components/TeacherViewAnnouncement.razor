@@ -5,10 +5,10 @@
     <MudPaper Class="p-2 d-flex flex-row align-center">
         <MudGrid>
             <MudItem sm="12" md="12" lg="6" Style="word-break: break-word">
-                <MudText><b>@Announcement.AnnouncementText</b></MudText>
+                <MudText><b>@((MarkupString)FormattedAnnouncement)</b></MudText>
                 <MudSpacer></MudSpacer>
             </MudItem>
-            <MudItem sm="12" md="6"
+            <MudItem sm="12"
                      Class="is-display-flex is-justify-content-end is-align-items-center">
                 <MudButton OnClick="() => ArchiveQuestion(Announcement.Id)" Class="ml-2"
                            Color="ArchiveColor" Variant="Variant.Filled">
@@ -52,5 +52,21 @@
     private void ArchiveQuestion(string id)
     {
         OnArchive(id);
+    }
+    
+    private string FormattedAnnouncement => ConvertLinks(Announcement.AnnouncementText);
+
+    private string ConvertLinks(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return text;
+
+        // Regex to detect URLs
+        string pattern = @"(https?://[^\s]+)";
+        var regex = new System.Text.RegularExpressions.Regex(pattern);
+
+        // Replace URLs with <a> tags
+        return regex.Replace(text, match => 
+            $"<a style=\"text-decoration: underline;\" href=\"{match.Value}\" target=\"_blank\">{match.Value}</a>");
     }
 }

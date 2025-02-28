@@ -86,7 +86,7 @@
 
                         <MudPaper Class="p-4 mb-2">
                             <MudText Typo="Typo.h5">
-                                <b>@announcement.AnnouncementText</b>
+                                <b>@((MarkupString)ConvertLinks(announcement.AnnouncementText))</b>
                             </MudText>
                             <br/>
                         </MudPaper>

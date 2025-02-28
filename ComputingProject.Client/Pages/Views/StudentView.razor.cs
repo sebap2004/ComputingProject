@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Text.RegularExpressions;
 using ComputingProject.Client.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -23,10 +24,18 @@ public partial class StudentView : ComponentBase
     private string NotepadInput {get;set;}
     private string HandUpIcon => HasHandUp ? Icons.Material.Filled.Cancel : Icons.Material.Filled.FrontHand;
     private Color HandUpColor => HasHandUp ? Color.Error : Color.Primary;
-    
     private bool HelpRequestAcknowledged { get; set; }
     public bool HasHandUp {get; set;}
     private bool IsConnected { get; set; }
+    private string ConvertLinks(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return text;
+        string pattern = @"(https?://[^\s]+)";
+        var regex = new Regex(pattern);
+        return regex.Replace(text, match => 
+            $"<a style=\"text-decoration: underline;\" href=\"{match.Value}\" target=\"_blank\">{match.Value}</a>");
+    }
 
     private async Task AskForHelp()
     {
