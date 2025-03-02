@@ -1,0 +1,32 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<MudDialog OnBackdropClick="_ => { }">
+    <TitleContent>
+        <MudText Typo="Typo.h5">BEFORE YOU GO</MudText>
+        <MudText>Please make sure to fill out the survey asking about your experience with this software</MudText>
+    </TitleContent>
+    <DialogContent>
+        
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Disabled="!HasPressedSurveyButton" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    
+    private bool HasPressedSurveyButton { get; set; }
+    
+    private void Cancel() => MudDialog.Cancel();
+    
+    private void HandleLogin()
+    {
+        if (!HasPressedSurveyButton) return;
+        Navigation.NavigateTo("/");
+    }
+}

@@ -51,7 +51,7 @@ public partial class Home
             return Task.CompletedTask;
         }
         var options = new DialogOptions { CloseOnEscapeKey = true };
-        return DialogService.ShowAsync<StudentLoginDialog>("Simple Dialog", options);
+        return DialogService.ShowAsync<StudentLoginDialog>("Student Login", options);
     }
     
     private Task OpenTeacherDialog()
@@ -62,6 +62,6 @@ public partial class Home
             return Task.CompletedTask;
         }
         var options = new DialogOptions { CloseOnEscapeKey = true };
-        return DialogService.ShowAsync<TeacherLoginDialog>("Simple Dialog", options);
+        return DialogService.ShowAsync<TeacherLoginDialog>("Teacher Login", options);
     }
 }

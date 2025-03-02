@@ -52,4 +52,5 @@ public class LoginModel
     public bool IsTeacher { get; set; }
     public string Username { get; set; }
     public string Password { get; set; }
+    public bool HasReadPISandSignedConsent { get; set; }
 }

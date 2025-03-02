@@ -2,6 +2,7 @@
 @using ComputingProject.Client.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @using ComputingProject.Client.Components
+@using ComputingProject.Client.Layout
 @using MudExtensions
 @rendermode InteractiveWebAssembly
 @inject ISnackbar Snackbar
@@ -9,6 +10,7 @@
 @inject IClassroomServer ClassroomServer
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@layout MainLayout
 
 <PageTitle>Student View</PageTitle>
 
@@ -143,5 +145,6 @@ else
         </MudLoading>
     </MudPaper>
 }
+
 
 
