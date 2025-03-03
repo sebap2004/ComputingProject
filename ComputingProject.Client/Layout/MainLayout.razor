@@ -18,7 +18,7 @@
         <MudPaper Elevation="0" Style="@($"background-color: rgba(0,0,0,0)")" Class="d-flex is-align-items-center">
             
             <MudLink Class="d-flex is-align-items-center" Href="/"><MudImage Width="48" Height="48" Src="img/HandsUp.png"></MudImage></MudLink>
-            <MudLink Typo="Typo.h5" Underline="Underline.None" Href="/" Class="mr-3"><b>HandsUp</b></MudLink>
+            <MudLink Typo="Typo.h5" Underline="Underline.None" Href="/" Class="mr-3"><b>HandsUp Prototype Testing</b></MudLink>
         </MudPaper>
         <CascadingAuthenticationState>
             <AuthorizeView>
@@ -83,12 +83,10 @@
         return Task.CompletedTask;
     }
     
-    private void Cancel() => StudentConfirmExitDialog.CloseAsync();
-    
-    private void HandleLogin()
+    private async Task Cancel()
     {
-        if (!HasPressedSurveyButton) return;
-        Navigation.NavigateTo("/");
+        HasPressedSurveyButton = false;
+        await StudentConfirmExitDialog.CloseAsync();
     }
     
     [JSInvokable]
@@ -100,6 +98,7 @@
             await StudentConfirmExitDialog.ShowAsync();
         }
     }
+    
 
     public async Task AttemptLogout()
     {
@@ -107,6 +106,10 @@
         if (authState.User.FindFirst(ClaimTypes.Role)?.Value == "Student")
         {
            await StudentConfirmExitDialog.ShowAsync();
+        }
+        else
+        {
+            await LogOut();
         }
     }
 
