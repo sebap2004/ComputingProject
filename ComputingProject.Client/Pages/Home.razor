@@ -10,20 +10,55 @@
 
 <div class="is-flex is-flex-direction-column is-align-items-center" style="height: 100%">
     <PageTitle>Home</PageTitle>
+    @if (HasReadDocuments)
+    {
+        <MudText Typo="Typo.h3" GutterBottom="true">Welcome to the experiment.</MudText>
+        <br/>
+        <MudText>Are you a teacher or a student?</MudText>
+        <br/>
+        <MudStack Row="true">
+            <MudButton OnClick="OpenTeacherDialog" Class="m-3" Variant="Variant.Filled" Color="Color.Primary"
+                       Style="height: 12.5rem; width: 12.5rem">
+                <MudText Typo="Typo.h4"><b>Teacher</b></MudText>
+            </MudButton>
 
-    <MudText Typo="Typo.h3" GutterBottom="true">Welcome to the experiment.</MudText>
-    <br/>
-    <MudText>Are you a teacher or a student?</MudText>
-    <br/>
-    <MudStack Row="true">
-        <MudButton OnClick="OpenTeacherDialog" Class="m-3" Variant="Variant.Filled" Color="Color.Primary" Style="height: 12.5rem; width: 12.5rem">
-            <MudText Typo="Typo.h4"><b>Teacher</b></MudText>
-        </MudButton>
-        
-        <MudButton OnClick="OpenStudentDialog" Class="m-3" Variant="Variant.Filled" Color="Color.Secondary" Style="height: 12.5rem; width: 12.5rem">
-            <MudText Typo="Typo.h4"><b>Student</b></MudText>
-        </MudButton>
-    </MudStack>
+            <MudButton OnClick="OpenStudentDialog" Class="m-3" Variant="Variant.Filled" Color="Color.Secondary"
+                       Style="height: 12.5rem; width: 12.5rem">
+                <MudText Typo="Typo.h4"><b>Student</b></MudText>
+            </MudButton>
+        </MudStack>
+    }
+    else
+    {
+        <div class="is-flex is-flex-direction-column is-align-items-center" style="width: 50%">
+            <MudText Typo="Typo.h3"><b>Documents to read</b></MudText>
+            <br/>
+            <div>
+                <MudText>Before continuing, please make sure to read through these documents in their entirety.</MudText>
+                <br/>
+                <MudText>The PIS document informs you of what will happen in this experiment, and explain how your data will be used.</MudText>
+                <MudText>The consent form will be a confirmation of your willingness to participate.</MudText>
+            </div>
+            <br/>
+            <br/>
+            <MudStack Row="true">
+                <MudButton Href="/documents/ConsentFormTest.pdf" OnClick="() => HasReadPIS = true" Target="_blank" Variant="Variant.Filled" Color="Color.Primary">PIS Document</MudButton>
+                <MudButton Href="/documents/PISDocumentTest.pdf" OnClick="() => HasReadConsentForm = true" Target="_blank" Variant="Variant.Filled" Color="Color.Primary">Consent form</MudButton>
+            </MudStack>
+            <br/>
+            @if (HasReadPIS && HasReadConsentForm)
+            {
+                <MudText GutterBottom="true"><b>BY PRESSING CONTINUE, YOU CONSENT TO TAKING PART IN THIS EXPERIMENT.</b></MudText>
+                <MudButton Size="Size.Large" OnClick="() => HasReadDocuments = true" Variant="Variant.Filled" Color="Color.Secondary">Continue</MudButton>
+            }
+            else
+            {
+                
+                <MudText Color="Color.Error"><b>You must read both documents before continuing.</b></MudText>
+            }
+        </div>
+    }
+
     <MudSpacer/>
     <MudPaper Class="p-4 d-flex is-flex-direction-row is-align-items-center" Height="4rem" Width="100%">
         Jean-Sebastien Prenovost - 2025

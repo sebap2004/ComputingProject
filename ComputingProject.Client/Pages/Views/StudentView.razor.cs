@@ -55,6 +55,7 @@ public partial class StudentView : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        
         IsConnected = false;
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;

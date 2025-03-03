@@ -290,31 +290,4 @@ public class DefaultTheme : MudTheme
             Tooltip = 1600,
         }; 
     }
-
-    private static RGBA ParseStringHexToRgba(string value)
-    {
-        if (value.StartsWith('#'))
-        {
-            value = value.Substring(1);
-        }
-        switch (value.Length)
-        {
-            case 3:
-                value = new string(new[] { value[0], value[0], value[1], value[1], value[2], value[2], 'F', 'F' });
-                break;
-            case 4:
-                value = new string(new[] { value[0], value[0], value[1], value[1], value[2], value[2], value[3], value[3] });
-                break;
-            case 6:
-                value += "FF";
-                break;
-            case 8:
-                break;
-            default:
-                throw new ArgumentException(@"Not a valid color.", nameof(value));
-        }
-
-        return new RGBA(0, 0, 0, 0);
-    }
-    private readonly record struct RGBA(byte R, byte G, byte B, byte A);
 }

@@ -16,7 +16,6 @@
                                   @bind-Value="loginModel.Username" For="@(() => loginModel.Username)"/>
                     <MudTextField Error="Error" ErrorText="Incorrect Password." Label="Password" HelperText="Ask the project leader if you've forgotten" Class="mt-3"
                                   @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" InputType="InputType.Password"/>
-                    <MudCheckBox ErrorText="You must have read the PIS and signed the consent form." Color="Color.Secondary" LabelPlacement="Placement.Start" @bind-Value="loginModel.HasReadPISandSignedConsent">I have read the PIS and signed the consent form</MudCheckBox>
                 </MudCardContent>
                 <MudCardActions>
                     <MudSpacer />
@@ -39,11 +38,6 @@
     
     private async Task HandleLogin()
     {
-        if (!loginModel.HasReadPISandSignedConsent)
-        {
-            Error = true;
-            return;
-        }
         loginModel.IsTeacher = false;
         var response = await HttpClient.PostAsJsonAsync("api/auth/login", loginModel);
         if (response.IsSuccessStatusCode)

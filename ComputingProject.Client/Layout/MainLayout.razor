@@ -71,10 +71,17 @@
     private bool _drawerOpen = true;
     private bool _isDarkMode = true;
     private MudTheme? _theme = null;
+    private DotNetObjectReference<MainLayout> NetRef;
 
     private MudDialog StudentConfirmExitDialog;
     
     private bool HasPressedSurveyButton { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        NetRef = DotNetObjectReference.Create(this);
+        return Task.CompletedTask;
+    }
     
     private void Cancel() => StudentConfirmExitDialog.CloseAsync();
     
@@ -82,6 +89,16 @@
     {
         if (!HasPressedSurveyButton) return;
         Navigation.NavigateTo("/");
+    }
+    
+    [JSInvokable]
+    public async Task BeforeUnloadStudentView()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.FindFirst(ClaimTypes.Role)?.Value == "Student")
+        {
+            await StudentConfirmExitDialog.ShowAsync();
+        }
     }
 
     public async Task AttemptLogout()

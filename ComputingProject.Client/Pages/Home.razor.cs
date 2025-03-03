@@ -9,8 +9,10 @@ public partial class Home
 {
     private string? UserName {get; set;}
     private string? UserRole {get; set;}
-    
     private bool IsAuthenticated {get; set;}
+    private bool HasReadDocuments {get; set;}
+    private bool HasReadPIS {get; set;}
+    private bool HasReadConsentForm {get; set;}
     
     protected override async Task OnInitializedAsync()
     {
