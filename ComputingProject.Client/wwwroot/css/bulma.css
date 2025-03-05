@@ -2962,6 +2962,8 @@ pre {
   -webkit-font-smoothing: auto;
   font-family: var(--bulma-code-family);
 }
+
+
 a,
 button {
   cursor: pointer;
@@ -13642,7 +13644,7 @@ label.panel-block:hover {
   flex-shrink: 0;
 }
 
-.hero-body {
+.hero-body{
   flex-grow: 1;
   flex-shrink: 0;
   padding: var(--bulma-hero-body-padding);

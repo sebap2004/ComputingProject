@@ -17,6 +17,8 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
     public event Action<List<string>>? OnReceiveStudentList;
     public event Action<List<string>>? OnReceiveActiveHelpRequests;
     public event Action<List<TeacherQuestion>>? OnReceiveActiveQuestions;
+    public event Action<List<TeacherAnnouncement>>? OnReceiveAnnouncements;
+    public event Action<string>? OnReceiveCurrentTask;
     public event Action<string>? OnArchiveTeacherQuestion;
     public event Action? OnAcknowledgeHelpRequest;
     public event Action? OnResolveHelpRequest;
@@ -26,17 +28,18 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
     public ClassroomClientService(HubConnection hubConnection)
     {
         _hubConnection = hubConnection;
-        _hubConnection.On<string, string, bool>("ReceiveMessage", ReceiveMessage);
         _hubConnection.On<ClassroomState>("GetClassroomState", GetClassroomState);
-        _hubConnection.On<List<String>>("SendStudentJoinedMessage", SendStudentJoinedMessage);
-        _hubConnection.On<List<String>>("SendStudentLeftMessage", SendStudentLeftMessage);
+        _hubConnection.On<List<String>>("SendStudentJoinedMessage", GetStudentJoinedMessage);
+        _hubConnection.On<List<String>>("SendStudentLeftMessage", GetStudentLeftMessage);
         _hubConnection.On<List<String>>("GetStudents", GetStudents);
         _hubConnection.On<List<String>>("GetActiveHelpRequests", GetActiveHelpRequests);
         _hubConnection.On<List<TeacherQuestion>>("GetActiveQuestions", GetActiveQuestions);
         _hubConnection.On<string>("ArchiveTeacherQuestion", ArchiveTeacherMethods);
-        _hubConnection.On("ReceiveAcknowledgementForHelpRequest", AcknowledgeHelpRequest);
-        _hubConnection.On("ReceiveResolutionForHelpRequest", ResolveHelpRequest);
+        _hubConnection.On("GetAcknowledgementForHelpRequest", AcknowledgeHelpRequest);
+        _hubConnection.On("GetResolutionForHelpRequest", ResolveHelpRequest);
         _hubConnection.On<string, string>("AnswerTeacherQuestion", AnswerTeacherQuestion);
+        _hubConnection.On<List<TeacherAnnouncement>>("GetAnnouncements", GetAnnouncements);
+        _hubConnection.On<string>("GetCurrentTask", GetCurrentTask);
     }
 
     public Task AnswerTeacherQuestion(string questionID, string answer)
@@ -84,7 +87,7 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
         await _hubConnection.StopAsync();
     }
 
-    public Task ReceiveMessage(string sender, string content, bool systemMessage)
+    public Task GetMessage(string sender, string content, bool systemMessage)
     {
         OnMessageReceived?.Invoke(sender, content, systemMessage);
         return Task.CompletedTask;
@@ -118,25 +121,37 @@ public class ClassroomClientService : IClassroomClient, IClassroomService
         return Task.CompletedTask;
     }
 
-    public Task SendStudentJoinedMessage(List<String> Users)
+    public Task GetAnnouncements(List<TeacherAnnouncement> announcements)
+    {
+        OnReceiveAnnouncements?.Invoke(announcements);
+        return Task.CompletedTask;
+    }
+
+    public Task GetCurrentTask(string task)
+    {
+        OnReceiveCurrentTask?.Invoke(task);
+        return Task.CompletedTask;
+    }
+
+    public Task GetStudentJoinedMessage(List<String> Users)
     {
         OnStudentJoinedMessage?.Invoke(Users);
         return Task.CompletedTask;
     }
 
-    public Task SendStudentLeftMessage(List<String> Users)
+    public Task GetStudentLeftMessage(List<String> Users)
     {
         OnStudentLeftMessage?.Invoke(Users);
         return Task.CompletedTask;
     }
 
-    public Task ReceiveAcknowledgementForHelpRequest()
+    public Task GetAcknowledgementForHelpRequest()
     {
         OnAcknowledgeHelpRequest?.Invoke();
         return Task.CompletedTask;
     }
 
-    public Task ReceiveResolutionForHelpRequest()
+    public Task GetResolutionForHelpRequest()
     {
         OnResolveHelpRequest?.Invoke();
         return Task.CompletedTask;

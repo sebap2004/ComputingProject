@@ -1,0 +1,72 @@
+﻿@using ComputingProject.Client.Services
+@using MudExtensions
+
+<MudItem xs="12">
+    <MudPaper Class="p-2 d-flex flex-row align-center">
+        <MudGrid>
+            <MudItem sm="12" md="12" lg="6" Style="word-break: break-word">
+                <MudText><b>@((MarkupString)FormattedAnnouncement)</b></MudText>
+                <MudSpacer></MudSpacer>
+            </MudItem>
+            <MudItem sm="12"
+                     Class="is-display-flex is-justify-content-end is-align-items-center">
+                <MudButton OnClick="() => ArchiveQuestion(Announcement.Id)" Class="ml-2"
+                           Color="ArchiveColor" Variant="Variant.Filled">
+                    @if (Announcement.Archived)
+                    {
+                        <MudText Class="mr-2" Align="Align.Center" Typo="Typo.button">Show
+                        </MudText>
+                        <MudIcon Icon="@Icons.Material.Outlined.Unarchive"></MudIcon>
+                    }
+                    else
+                    {
+                        <MudText Class="mr-2" Align="Align.Center" Typo="Typo.button">Hide
+                        </MudText>
+                        <MudIcon Icon="@Icons.Material.Outlined.Archive"></MudIcon>
+                    }
+                </MudButton>
+                <MudButton OnClick="() => DeleteQuestion(Announcement.Id)" Class="ml-2"
+                           Color="Color.Error"
+                           Variant="Variant.Filled"
+                           StartIcon="@Icons.Material.Outlined.Delete">
+                    Delete
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</MudItem>
+
+
+@code
+{
+    [Parameter] public Action<string> OnDelete { get; set; }
+    [Parameter] public Action<string> OnArchive { get; set; }
+    [Parameter] public TeacherAnnouncement Announcement { get; set; }
+    [Parameter] public Color ArchiveColor { get; set; }
+
+    private void DeleteQuestion(string id)
+    {
+        OnDelete(id);
+    }
+
+    private void ArchiveQuestion(string id)
+    {
+        OnArchive(id);
+    }
+    
+    private string FormattedAnnouncement => ConvertLinks(Announcement.AnnouncementText);
+
+    private string ConvertLinks(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return text;
+
+        // Regex to detect URLs
+        string pattern = @"(https?://[^\s]+)";
+        var regex = new System.Text.RegularExpressions.Regex(pattern);
+
+        // Replace URLs with <a> tags
+        return regex.Replace(text, match => 
+            $"<a style=\"text-decoration: underline;\" href=\"{match.Value}\" target=\"_blank\">{match.Value}</a>");
+    }
+}

@@ -34,7 +34,7 @@
         <CascadingAuthenticationState>
             <AuthorizeView>
                 <Authorized>
-                    <MudButton OnClick="AttemptLogout" Class="mr-2" Variant="Variant.Filled" Color="Color.Error">Exit Session</MudButton>
+                    <MudButton OnClick="LogOut" Class="mr-2" Variant="Variant.Filled" Color="Color.Secondary">Log Out</MudButton>
                 </Authorized>
                 <NotAuthorized>
                 </NotAuthorized>
@@ -42,24 +42,11 @@
         </CascadingAuthenticationState>
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
     </MudAppBar>
-    <MudMainContent Class="mt-16 pa-4 pb-0" Style="min-height: calc(100vh - var(--mud-appbar-height))">
+    <MudMainContent Class="mt-16 pa-4 pb-0 pl-0 pr-0" Style="height: calc(100vh - var(--mud-appbar-height));">
         @Body
     </MudMainContent>
 </MudLayout>
 
- <MudDialog @ref="StudentConfirmExitDialog" OnBackdropClick="_ => { }">
-     <TitleContent>
-         <MudText Typo="Typo.h5">BEFORE YOU GO</MudText>
-         <MudText>Please make sure to fill out the survey asking about your experience with this software</MudText>
-     </TitleContent>
-     <DialogContent>
-<MudButton Href="https://www.youtube.com/" Target="_blank" FullWidth="true" OnClick="() => HasPressedSurveyButton = true" Variant="Variant.Filled" Color="Color.Primary">Survey Link</MudButton>
-     </DialogContent>
-     <DialogActions>
-         <MudButton OnClick="Cancel">Cancel</MudButton>
-         <MudButton OnClick="LogOut" Disabled="!HasPressedSurveyButton" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Ok</MudButton>
-     </DialogActions>
- </MudDialog>
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
@@ -71,47 +58,6 @@
     private bool _drawerOpen = true;
     private bool _isDarkMode = true;
     private MudTheme? _theme = null;
-    private DotNetObjectReference<MainLayout> NetRef;
-
-    private MudDialog StudentConfirmExitDialog;
-    
-    private bool HasPressedSurveyButton { get; set; }
-
-    protected override Task OnInitializedAsync()
-    {
-        NetRef = DotNetObjectReference.Create(this);
-        return Task.CompletedTask;
-    }
-    
-    private async Task Cancel()
-    {
-        HasPressedSurveyButton = false;
-        await StudentConfirmExitDialog.CloseAsync();
-    }
-    
-    [JSInvokable]
-    public async Task BeforeUnloadStudentView()
-    {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.FindFirst(ClaimTypes.Role)?.Value == "Student")
-        {
-            await StudentConfirmExitDialog.ShowAsync();
-        }
-    }
-    
-
-    public async Task AttemptLogout()
-    {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.FindFirst(ClaimTypes.Role)?.Value == "Student")
-        {
-           await StudentConfirmExitDialog.ShowAsync();
-        }
-        else
-        {
-            await LogOut();
-        }
-    }
 
     public async Task LogOut()
     {

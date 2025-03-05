@@ -160,12 +160,7 @@ pre {
   font-family: var(--bulma-code-family);
 }
 
-body {
-  color: var(--bulma-body-color);
-  font-size: var(--bulma-body-font-size);
-  font-weight: var(--bulma-body-weight);
-  line-height: var(--bulma-body-line-height);
-}
+
 
 a,
 button {

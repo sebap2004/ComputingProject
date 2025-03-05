@@ -2,12 +2,17 @@
 @using ComputingProject.Client.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @using ComputingProject.Client.Components
+@using ComputingProject.Client.Layout
+@using MudExtensions
 @rendermode InteractiveWebAssembly
 @inject ISnackbar Snackbar
 @inject IClassroomService ClassroomService
 @inject IClassroomServer ClassroomServer
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@layout MainLayout
+
+<PageTitle>Student View</PageTitle>
 
 @if (IsConnected)
 {
@@ -20,14 +25,15 @@
             @if (ActiveQuestions.Count <= 0)
             {
                 <MudPaper Height="48rem"
-                          Class="mud-theme-primary is-flex is-justify-content-center is-align-items-center">
+                          Class="is-flex is-justify-content-center is-align-items-center"
+                          Style="@($"background:{Theme.PaletteLight.DarkLighten};")">
                     <MudText Typo="Typo.h3" Color="Color.Default">No questions yet!</MudText>
                 </MudPaper>
             }
             else
             {
-                <MudText>@MessageInput</MudText>
-                <MudPaper Height="48rem" Class="mud-theme-primary is-overflow-y-auto p-2">
+                <MudPaper Height="48rem" Style="@($"background:{Theme.PaletteLight.DarkLighten};")"
+                          Class="is-overflow-y-auto p-2">
                     @foreach (var currentQuestion in ActiveQuestions)
                     {
                         if (currentQuestion.Archived)
@@ -40,9 +46,9 @@
                             continue;
                         }
 
-                        <MudPaper Class="p-4 mb-2" Height="10rem">
+                        <MudPaper Class="p-4 mb-2" MinHeight="10rem">
                             <MudText Typo="Typo.h5">
-                                <b>@currentQuestion.Question</b>
+                                <b>@currentQuestion.QuestionText</b>
                             </MudText>
                             <br/>
                             <MudPaper Elevation="0" Class="d-flex flex-row">
@@ -61,55 +67,84 @@
             }
         </StudentGridItem>
         <StudentGridItem>
-            @if (CurrentClassroomState == ClassroomState.Workshop)
-            {
-                <MudTextField @bind-Value="NotepadInput" T="string" Lines="25" FullWidth="true" Label="Notes"
-                              Placeholder="Just write anything here" Variant="Variant.Filled"></MudTextField>
-                <MudText GutterBottom="true" Class="mb-3" Typo="Typo.h5"><b>Ask teacher for help</b></MudText>
-                <MudPaper Class="d-flex is-align-items-center" Height="20%" Elevation="0">
-                    <MudPaper Class="d-flex is-align-items-center" Elevation="0">
-                        @if (HasHandUp)
+            <MudPaper Class="d-flex is-flex-direction-column" Height="100%" Elevation="0">
+                @if (string.IsNullOrWhiteSpace(CurrentTask))
+                {
+                    <MudText Align="Align.Center" Typo="Typo.h4">No task assigned yet.</MudText>
+                }
+                else
+                {
+                    <MudText Align="Align.Center" Typo="Typo.h4">Current Task: @CurrentTask</MudText>
+                }
+                <hr style="@($"background-color:{Theme.PaletteDark.GrayDark};")"/>
+                <MudText Typo="Typo.h5" GutterBottom="true"><b>Teacher Announcements:</b></MudText>
+                <MudPaper Height="60%"
+                          Class="is-overflow-y-auto p-2"
+                          Style="@($"background:{Theme.PaletteLight.DarkLighten};")">
+                    @foreach (var announcement in Announcements)
+                    {
+                        if (announcement.Archived)
                         {
-                            if (HelpRequestAcknowledged)
-                            {
-                                <MudText Typo="Typo.h5">The teacher has acknowledged your help request and is coming
-                                    your way soon!
-                                </MudText>
-                            }
-                            else
-                            {
-                                <MudText Typo="Typo.h5">Your hand is up! Waiting for teacher acknowledgement...
-                                </MudText>
-                            }
+                            continue;
                         }
-                    </MudPaper>
-                    <MudSpacer></MudSpacer>
-                    <MudButton OnClick="AskForHelp" Variant="Variant.Filled" Color="HandUpColor" EndIcon="@HandUpIcon"
-                               Style="width: 10rem; height: 10rem;">
-                        @if (HasHandUp)
-                        {
-                            <MudText Typo="Typo.button">Cancel</MudText>
-                        }
-                        else
-                        {
-                            <MudText Typo="Typo.button">Ask For Help</MudText>
-                        }
-                    </MudButton>
+
+                        <MudPaper Class="p-4 mb-2">
+                            <MudText Typo="Typo.h5">
+                                <b>@((MarkupString)ConvertLinks(announcement.AnnouncementText))</b>
+                            </MudText>
+                            <br/>
+                        </MudPaper>
+                    } 
                 </MudPaper>
-            }
-            else
-            {
-                <MudText>Locked in Lecture Mode.</MudText>
-            }
+                <MudSpacer></MudSpacer>
+                @if (CurrentClassroomState == ClassroomState.Workshop)
+                {
+                    <MudPaper Height="20%" Elevation="0" Class="mt-2 d-flex is-display-flex flex-column">
+                        <MudText GutterBottom="true" Class="mb-3" Typo="Typo.h5"><b>Ask teacher for help</b></MudText>
+                        <MudPaper Class="d-flex flex-column is-align-items-center is-flex-grow-1" Elevation="0">
+                            <MudButton FullWidth="true" OnClick="AskForHelp" Variant="Variant.Filled" Color="HandUpColor"
+                                       EndIcon="@HandUpIcon"
+                                       Style="height: 100%;">
+                                @if (HasHandUp)
+                                {
+                                    <MudText Typo="Typo.button">Cancel</MudText>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.button">Ask For Help</MudText>
+                                }
+                            </MudButton>
+                            @if (HasHandUp)
+                            {
+                                <MudPaper Width="100%" Class="d-flex is-justify-content-center mt-4 is-align-items-center" Elevation="0">
+                                    @if (HelpRequestAcknowledged)
+                                    {
+                                        <MudText Align="Align.Center" Typo="Typo.h5">The teacher acknowledged your request and is on the way!
+                                        </MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText Align="Align.Center" Typo="Typo.h5">Your hand is up! Waiting for teacher acknowledgement...
+                                        </MudText>
+                                    }
+                                </MudPaper>
+                            }
+                        </MudPaper>
+                    </MudPaper>
+                }
+            </MudPaper>
         </StudentGridItem>
     </MudGrid>
 }
 else
 {
-    <MudPaper Class="is-display-flex is-justify-content-center is-flex-direction-row is-align-items-center" Height="90vh">
-        <MudProgressCircular StrokeWidth="4" Size="Size.Large" Color="Color.Default" Indeterminate="true" />
-        <MudText Class="ml-3" Typo="Typo.h2"><b>Connecting...</b></MudText>
+    <MudPaper Class="is-display-flex is-justify-content-center is-flex-direction-row is-align-items-center"
+              Height="90vh">
+        <MudLoading Darken="true" Loading="true" Text="Connecting...">
+
+        </MudLoading>
     </MudPaper>
 }
+
 
 

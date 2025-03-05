@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using ComputingProject.Client.Services;
+using ComputingProject.Client.Themes;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -10,9 +11,15 @@ namespace ComputingProject.Client.Pages.Views;
 public partial class TeacherView : ComponentBase
 {
     // Members related to the classroom state
+    private readonly DialogOptions _dialogOptions = new() { FullWidth = true };
+    private bool _visible;
+    private MudDialog _dialog;
+    private MudBreakpointProvider _breakpointProvider;
     private List<string> ConnectedStudents { get; set; } = new List<string>();
     public List<string> ActiveHelpRequests { get; set; } = new();
     public List<TeacherQuestion> ActiveQuestions { get; set; } = new ();
+    public List<TeacherAnnouncement> Announcements { get; set; } = new ();
+    public string CurrentTask { get; set; }
     private int StudentCount => ConnectedStudents.Count;
     private ClassroomState CurrentClassroomState;
     private List<Message> messages = new List<Message>();
@@ -21,32 +28,71 @@ public partial class TeacherView : ComponentBase
     private List<string> AcknowledgedQuestions { get; set; } = new();
     private bool QuestionIsAcknowledged(string questionId) => AcknowledgedQuestions.Contains(questionId);
     private bool IsConnected { get; set; }
-    
-    
-    
-    private MudTheme Theme = new MudTheme();
+    private MudTheme Theme = new DefaultTheme();
     private string UserName { get; set; }
     private string UserRole { get; set; }
     private string QuestionInput { get; set; }
+    private string AnnouncementInput { get; set; }
+    private string TaskInput { get; set; }
     private Color WorkshopButtonColor => CurrentClassroomState == ClassroomState.Workshop ? Color.Primary : Color.Secondary;
     private Color LectureButtonColor => CurrentClassroomState == ClassroomState.Lecture ? Color.Primary : Color.Secondary;
     private Color ArchiveColor(bool archived) => archived ? Color.Secondary : Color.Warning;
     private Color ViewingColor(bool archived) => archived ? Color.Primary : Color.Info;
 
-
-    private async Task SendAcknowledgement(string ID)
+    private void SendAcknowledgement(string ID)
     {
         Console.WriteLine("Acknowledging " + ID);
-        await ClassroomServer.AcknowledgeHelpRequest(ID);
+        ClassroomServer.AcknowledgeHelpRequest(ID);
         AcknowledgedQuestions.Add(ID);
         StateHasChanged();
     }
     
-    private async Task SendResolve(string ID)
+    private void SendResolve(string ID)
     {
         Console.WriteLine("Resolving " + ID);
-        await ClassroomServer.ResolveHelpRequest(ID);
+        ClassroomServer.ResolveHelpRequest(ID);
         AcknowledgedQuestions.Remove(ID);
+        StateHasChanged();
+    }
+
+    async Task SendNewAnnouncement()
+    {
+        TeacherAnnouncement announcement = new TeacherAnnouncement
+        {
+            Id =RandomIDGenerator.GenerateRandomID(),
+            AnnouncementText = AnnouncementInput
+        };
+        await ClassroomServer.AddAnnouncement(announcement);
+        Console.WriteLine("Sent new announcement " + announcement.AnnouncementText);
+        AnnouncementInput = string.Empty;
+        StateHasChanged();
+    }
+    
+    private void RemoveAnnouncement(string id)
+    {
+        ClassroomServer.RemoveAnnouncement(id);
+        StateHasChanged();
+    }
+    
+    private void ToggleHideAnnouncement(string id)
+    {
+        ClassroomServer.ToggleHideAnnouncement(id);
+        StateHasChanged();
+    }
+
+    async Task SetCurrentTask()
+    {
+        await ClassroomServer.SetCurrentTask(TaskInput);
+        Console.WriteLine("Set current task: " + TaskInput);
+        TaskInput = string.Empty;
+        StateHasChanged();
+    }
+    
+    async Task ResetTask()
+    {
+        await ClassroomServer.SetCurrentTask("");
+        Console.WriteLine("Reset current task");
+        TaskInput = string.Empty;
         StateHasChanged();
     }
     
@@ -64,7 +110,7 @@ public partial class TeacherView : ComponentBase
             {
                 NavigationManager.NavigateTo($"/access-denied/{Uri.EscapeDataString($"incorrectrole")}");
             }
-            _ = ConnectToHub();
+            await ConnectToHub();
         }
         else
         {
@@ -72,7 +118,7 @@ public partial class TeacherView : ComponentBase
         }
     }
 
-    public async Task ConnectToHub()
+    private async Task ConnectToHub()
     {
         ClassroomService.OnMessageReceived += OnClassroomServiceOnOnMessageReceived;
         ClassroomService.GetState += OnClassroomServiceOnGetState;
@@ -81,6 +127,9 @@ public partial class TeacherView : ComponentBase
         ClassroomService.OnReceiveStudentList += OnClassroomServiceOnOnReceiveStudentList;
         ClassroomService.OnReceiveActiveQuestions += ReceiveActiveQuestions;
         ClassroomService.OnReceiveActiveHelpRequests += ClassroomServiceOnOnReceiveActiveHelpRequests;
+        ClassroomService.OnReceiveAnnouncements += ClassroomServiceOnOnReceiveAnnouncements;
+        ClassroomService.OnReceiveCurrentTask += ClassroomServiceOnOnReceiveCurrentTask;
+        
         try
         {
             await ClassroomService.StartAsync();
@@ -93,6 +142,9 @@ public partial class TeacherView : ComponentBase
             await ClassroomServer.GetClassroomState(UserName);
             await ClassroomServer.GetStudents();
             await ClassroomServer.GetActiveQuestions();
+            await ClassroomServer.GetActiveHelpRequests();
+            await ClassroomServer.GetAnnouncements();
+            await ClassroomServer.GetCurrentTask();
             IsConnected = true;
             StateHasChanged();
         }
@@ -102,6 +154,20 @@ public partial class TeacherView : ComponentBase
             Snackbar.Add("Failed to connect to classroom: " + ex.Message, Severity.Error);
         }
     }
+
+    private void ClassroomServiceOnOnReceiveCurrentTask(string obj)
+    {
+        CurrentTask = obj;
+        StateHasChanged();
+    }
+
+    private void ClassroomServiceOnOnReceiveAnnouncements(List<TeacherAnnouncement> obj)
+    {
+        Announcements = obj;
+        StateHasChanged();
+    }
+    
+    
 
     private void ClassroomServiceOnOnReceiveActiveHelpRequests(List<string> obj)
     {
@@ -128,15 +194,23 @@ public partial class TeacherView : ComponentBase
 
     private void ShowQuestion(string id)
     {
+        if (string.IsNullOrWhiteSpace(id)) return;
         SelectQuestionID = id;
-        Console.WriteLine("Showing question " + id + "...");
         SelectedQuestionObject = ActiveQuestions.FirstOrDefault(q => q.Id == id);
         StateHasChanged();
+        if (_visible)
+        {
+            Console.WriteLine("Already open");
+            return;
+        }
+        _dialog.ShowAsync();
+        _visible = true;
+        Console.WriteLine($"Showing question {SelectedQuestionObject.Id}");
     }
 
-    public async Task DeleteQuestion(string id)
+    public void DeleteQuestion(string id)
     {
-        await ClassroomServer.DeleteTeacherQuestion(id);
+        ClassroomServer.DeleteTeacherQuestion(id);
     }
     
     private void OnClassroomServiceOnOnReceiveStudentList(List<string> connectionList)
@@ -187,17 +261,33 @@ public partial class TeacherView : ComponentBase
         await ClassroomServer.SendTeacherQuestion(tempQuestion);
     }
 
-    private async Task EnterHandler(KeyboardEventArgs e)
+    private async Task QuestionEnterHandler(KeyboardEventArgs e)
     {
         if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
             await SendTeacherQuestion();
         }
     }
-
-    private async Task ArchiveQuestion(string questionID)
+    
+    private async Task AnnouncementEnterHandler(KeyboardEventArgs e)
     {
-        await ClassroomServer.ArchiveTeacherQuestion(questionID);
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await SendNewAnnouncement();
+        }
+    }
+    
+    private async Task TaskEnterHandler(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await SetCurrentTask();
+        }
+    }
+
+    private void ArchiveQuestion(string questionID)
+    {
+        ClassroomServer.ArchiveTeacherQuestion(questionID);
     }
     
     public async Task SetWorkshopState() 
@@ -217,6 +307,14 @@ public partial class TeacherView : ComponentBase
         public string user;
         public string message;
         public bool systemMessage;
+    }
+    
+    private void CloseViewAnswers()
+    {
+        _dialog.CloseAsync();
+        _visible = false;
+        SelectQuestionID = "";
+        SelectedQuestionObject = null;
     }
 
 }

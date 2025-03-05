@@ -16,8 +16,40 @@ public class ClassroomStateService
 
     // Current active questions in the session. Uses teacher object
     public List<TeacherQuestion> ActiveQuestions { get; set; } = new();
+    
+    // Current active announcements in session.
+    public List<TeacherAnnouncement> TeacherAnnouncements { get; set; } = new();
+    
+    public string CurrentTask { get; set; }
 
+    public void SetCurrentTask(string task)
+    {
+        CurrentTask = task;
+    }
 
+    public void AddTeacherAnnouncement(TeacherAnnouncement announcement)
+    {
+        TeacherAnnouncements.Add(announcement);
+    }
+
+    public void RemoveTeacherAnnouncement(string announcementID)
+    {
+        TeacherAnnouncement? announcementToRemove = TeacherAnnouncements.FirstOrDefault(a => a.Id == announcementID);
+        if (announcementToRemove is not null)
+        {
+            TeacherAnnouncements.Remove(announcementToRemove);
+        }
+    }
+    
+    public void ToggleHideTeacherAnnouncement(string announcementID)
+    {
+        TeacherAnnouncement? announcementToRemove = TeacherAnnouncements.FirstOrDefault(a => a.Id == announcementID);
+        if (announcementToRemove is not null)
+        {
+            announcementToRemove.Archived = !announcementToRemove.Archived;
+        }
+    }
+    
     // Adds a student to the student list. String is user ID
     public void AddStudent(string user)
     {
@@ -44,7 +76,7 @@ public class ClassroomStateService
     {
         ActiveQuestions.Add(question);
         Console.WriteLine("Question added!");
-        Console.WriteLine(question.Question);
+        Console.WriteLine(question.QuestionText);
         Console.WriteLine(question.Id);
         Console.WriteLine(question.Archived);
         Console.WriteLine(question.Answers);
@@ -53,7 +85,7 @@ public class ClassroomStateService
         foreach (var q in ActiveQuestions)
         {
             Console.WriteLine("------------------------");
-            Console.WriteLine(q.Question);
+            Console.WriteLine(q.QuestionText);
             Console.WriteLine(q.Id);
             Console.WriteLine(q.Archived);
             Console.WriteLine("     ANSWERS:");

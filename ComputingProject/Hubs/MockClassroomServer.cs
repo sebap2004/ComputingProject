@@ -28,6 +28,16 @@ public class MockClassroomServer : IClassroomServer
         
     }
 
+    public Task GetCurrentTask()
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task GetAnnouncements()
+    {
+        return Task.CompletedTask;
+    }
+
     public Task SendTeacherQuestion(TeacherQuestion question)
     {
         return Task.CompletedTask;
@@ -74,6 +84,26 @@ public class MockClassroomServer : IClassroomServer
     }
 
     public Task DeleteTeacherQuestion(string questionId)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task AddAnnouncement(TeacherAnnouncement announcement)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task RemoveAnnouncement(string announcementId)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task ToggleHideAnnouncement(string announcementId)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task SetCurrentTask(string task)
     {
         return Task.CompletedTask;
     }
