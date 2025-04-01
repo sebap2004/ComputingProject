@@ -31,30 +31,41 @@
     else
     {
         <div class="is-flex is-flex-direction-column is-align-items-center" style="width: 50%">
-            <MudText Typo="Typo.h3"><b>Documents to read</b></MudText>
+            <MudText Typo="Typo.h3"><b>BEFORE YOU START</b></MudText>
             <br/>
             <div>
-                <MudText>Before continuing, please make sure to read through these documents in their entirety.</MudText>
+                <MudText>Thank you for agreeing to take part in this experiment!</MudText>
+                <MudText><b>Before continuing, please make sure to read through the following documents in their entirety:</b></MudText>
                 <br/>
-                <MudText>The PIS document informs you of what will happen in this experiment, and explain how your data will be used.</MudText>
-                <MudText>The consent form will be a confirmation of your willingness to participate.</MudText>
+                <MudText>-  The <b >PIS (Participant Information Sheet) DOCUMENT</b> informs you of what will happen in this experiment, and explain how your data will be used.</MudText>
+                <MudText>-  The <b >CONSENT FORM</b> will outline what you agree to by continuing.</MudText>
+                <br/>
+                <MudText>Before you leave, you will be prompted to fill out a <b>QUESTIONNAIRE</b>.</MudText>
+                <MudText>This questionnaire is <b >completely confidential.</b> NO personal data will be collected.</MudText>
+                <br/>
+                <MudText>All data moved around during this test (questions, hands up, answers) are completely transient and will NOT be stored when the experiment ends.</MudText>
             </div>
             <br/>
             <br/>
             <MudStack Row="true">
-                <MudButton Href="/documents/ConsentFormTest.pdf" OnClick="() => HasReadPIS = true" Target="_blank" Variant="Variant.Filled" Color="Color.Primary">PIS Document</MudButton>
-                <MudButton Href="/documents/PISDocumentTest.pdf" OnClick="() => HasReadConsentForm = true" Target="_blank" Variant="Variant.Filled" Color="Color.Primary">Consent form</MudButton>
+                <MudButton Href="/documents/PIS.pdf" OnClick="() => HasReadPIS = true" Target="_blank" Variant="Variant.Filled" Color="Color.Primary">PIS Document</MudButton>
+                <MudButton Href="/documents/Consent.pdf" OnClick="() => HasReadConsentForm = true" Target="_blank" Variant="Variant.Filled" Color="Color.Primary">Consent form</MudButton>
             </MudStack>
             <br/>
             @if (HasReadPIS && HasReadConsentForm)
             {
-                <MudText GutterBottom="true"><b>BY PRESSING CONTINUE, YOU CONSENT TO TAKING PART IN THIS EXPERIMENT.</b></MudText>
-                <MudButton Size="Size.Large" OnClick="() => HasReadDocuments = true" Variant="Variant.Filled" Color="Color.Secondary">Continue</MudButton>
+                <MudStack Row="true">
+                    <MudCheckBox @bind-Value="HasAgreedToConditions"></MudCheckBox>
+                    <MudText Align="Align.Center" Class="is-align-self-center"><b>BY PRESSING THE CHECKBOX AND CONTINUING, YOU CONSENT TO TAKING PART IN THIS EXPERIMENT.</b></MudText> 
+                </MudStack>
+                if (HasAgreedToConditions)
+                {
+                    <MudButton Size="Size.Large" OnClick="() => HasReadDocuments = true" Variant="Variant.Filled" Color="Color.Secondary">Continue</MudButton>
+                }
             }
             else
             {
-                
-                <MudText Color="Color.Error"><b>You must read both documents before continuing.</b></MudText>
+                <MudText Color="Color.Error"><b>You must read both documents before continuing (click both buttons).</b></MudText>
             }
         </div>
     }

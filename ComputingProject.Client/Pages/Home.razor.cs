@@ -13,6 +13,7 @@ public partial class Home
     private bool HasReadDocuments {get; set;}
     private bool HasReadPIS {get; set;}
     private bool HasReadConsentForm {get; set;}
+    private bool HasAgreedToConditions {get; set;}
     
     protected override async Task OnInitializedAsync()
     {

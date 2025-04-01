@@ -50,10 +50,11 @@
  <MudDialog @ref="StudentConfirmExitDialog" OnBackdropClick="_ => { }">
      <TitleContent>
          <MudText Typo="Typo.h5">BEFORE YOU GO</MudText>
-         <MudText>Please make sure to fill out the survey asking about your experience with this software</MudText>
      </TitleContent>
      <DialogContent>
-<MudButton Href="https://www.youtube.com/" Target="_blank" FullWidth="true" OnClick="() => HasPressedSurveyButton = true" Variant="Variant.Filled" Color="Color.Primary">Survey Link</MudButton>
+         <MudText>Please make sure to fill out the survey asking about your experience with this software</MudText>
+         <MudText GutterBottom="true">Your answers are confidential.</MudText>
+         <MudButton Href="https://www.youtube.com/" Target="_blank" FullWidth="true" OnClick="() => HasPressedSurveyButton = true" Variant="Variant.Filled" Color="Color.Primary">Survey Link</MudButton>
      </DialogContent>
      <DialogActions>
          <MudButton OnClick="Cancel">Cancel</MudButton>
