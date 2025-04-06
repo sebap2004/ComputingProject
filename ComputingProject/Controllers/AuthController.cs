@@ -12,7 +12,7 @@ public class AuthController : ControllerBase
     {
         if (model.IsTeacher)
         {
-            if (model.Password == "password")
+            if (model.Password == "iamateacher")
             {
                 // Sign in
                 Console.WriteLine("Successfully logged in as teacher - Username: " + model.Username + " IsTeacher: " + model.IsTeacher);
@@ -33,10 +33,9 @@ public class AuthController : ControllerBase
         }
         else
         {
-            if (model.Password == "password")
+            if (model.Password == "passwordforstudents")
             {
                 // Sign in
-                Console.WriteLine("Successfully logged in as student - Username: " + model.Username + " IsTeacher: " + model.IsTeacher);
                 var claims = new List<Claim>
                 {
                     new(ClaimTypes.Name, model.Username),

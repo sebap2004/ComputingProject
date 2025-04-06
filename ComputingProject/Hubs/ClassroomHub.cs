@@ -25,7 +25,7 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
             {
                 ClassroomStateService.AddStudent(Context.User.Identity.Name);
                 Groups.AddToGroupAsync(Context.ConnectionId, "Student");
-                Clients.Group("Teacher").GetStudentJoinedMessage(ClassroomStateService.ConnectedStudents);
+                Clients.All.GetStudentJoinedMessage(ClassroomStateService.ConnectedStudents);
                 Console.WriteLine("sent student joined teacher");
             }
             if (Role  == "Teacher")
@@ -48,8 +48,8 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
             ClassroomStateService.RemoveHelpRequest(Context.User.Identity.Name);
             if (Context.User.FindFirst(ClaimTypes.Role)?.Value == "Student")
             {
-                Clients.Group("Teacher").GetStudentLeftMessage(ClassroomStateService.ConnectedStudents);
-                Clients.Group("Teacher").GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
+                Clients.All.GetStudentLeftMessage(ClassroomStateService.ConnectedStudents);
+                Clients.All.GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
             }
         }
         return Task.CompletedTask;
@@ -68,19 +68,19 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
 
     public async Task GetClassroomState(string UserName)
     {
-        Console.WriteLine("Sent state to clients");
-        await Clients.User(UserName).GetClassroomState(ClassroomStateService.classroomState);
+        Console.WriteLine("Sent state to " + UserName);
+        await Clients.All.GetClassroomState(ClassroomStateService.classroomState);
     }
 
     public async Task GetStudents()
     {
         Console.WriteLine("Get student list, count: " + ClassroomStateService.ConnectedStudents.Count);
-        await Clients.Group("Teacher").GetStudents(ClassroomStateService.ConnectedStudents);
+        await Clients.All.GetStudents(ClassroomStateService.ConnectedStudents);
     }
 
     public async Task GetActiveHelpRequests()
     {
-        await Clients.Group("Teacher").GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
+        await Clients.All.GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
     }
 
     public async Task GetActiveQuestions()
