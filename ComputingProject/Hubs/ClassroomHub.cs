@@ -5,10 +5,25 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace ComputingProject.Hubs;
 
-
+/// <summary>
+/// Represents a signalR hub that handles communication between clients and
+/// manages state and interaction of a classroom environment.
+/// This class is the main process of the entire program's operation. It handles all of the real-time functionality of the application.
+/// It supports operations such as managing classroom
+/// state, sending messages, handling questions, processing help requests, and
+/// managing announcements.
+/// </summary>
 public class Classroom : Hub<IClassroomClient>, IClassroomServer
 {
+    /// <summary>
+    /// Classroom service to be injected into the hub via dependency injection.
+    /// </summary>
     private readonly ClassroomStateService ClassroomStateService;
+    
+    /// <summary>
+    /// Constructor for the classroom hub.
+    /// </summary>
+    /// <param name="stateService">State service to be injected into the system.</param>
     public Classroom(ClassroomStateService stateService)
     {
         ClassroomStateService = stateService;

@@ -6,6 +6,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComputingProject", "Computi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComputingProject.Client", "ComputingProject.Client\ComputingProject.Client.csproj", "{738DDAF1-964F-4378-8670-B241C92286F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{15E8753B-A9EB-4E22-9510-545A52AA9774}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,18 @@ Global
 		{082EF5A1-22A4-4822-A39A-88149C4462BF}.Release|x64.Build.0 = Release|Any CPU
 		{082EF5A1-22A4-4822-A39A-88149C4462BF}.Release|x86.ActiveCfg = Release|Any CPU
 		{082EF5A1-22A4-4822-A39A-88149C4462BF}.Release|x86.Build.0 = Release|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Debug|x64.Build.0 = Debug|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Debug|x86.Build.0 = Debug|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Release|x64.ActiveCfg = Release|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Release|x64.Build.0 = Release|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Release|x86.ActiveCfg = Release|Any CPU
+		{15E8753B-A9EB-4E22-9510-545A52AA9774}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
