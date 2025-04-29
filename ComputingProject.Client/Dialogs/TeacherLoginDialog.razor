@@ -36,6 +36,9 @@
     
     private void Cancel() => MudDialog.Cancel();
     
+    /// <summary>
+    /// Handles log in for a teacher. HTTP request is sent to authenticate, and if the request is successful, then redirect to the teacher view.
+    /// </summary>
     private async Task HandleLogin()
     {
         loginModel.IsTeacher = true;

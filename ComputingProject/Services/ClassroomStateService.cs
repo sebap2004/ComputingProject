@@ -43,7 +43,7 @@ public class ClassroomStateService
     /// Sets the current classroom task
     /// </summary>
     /// <param name="task">Task to set</param>
-    public void SetCurrentTask(string task)
+    public virtual void SetCurrentTask(string task)
     {
         CurrentTask = task;
     }
@@ -52,7 +52,7 @@ public class ClassroomStateService
     /// Adds a teacher announcement to the classroom.
     /// </summary>
     /// <param name="announcement">Announcement to add</param>
-    public void AddTeacherAnnouncement(TeacherAnnouncement announcement)
+    public virtual void AddTeacherAnnouncement(TeacherAnnouncement announcement)
     {
         TeacherAnnouncements.Add(announcement);
     }
@@ -61,7 +61,7 @@ public class ClassroomStateService
     /// Removes a teacher announcement from the classroom.
     /// </summary>
     /// <param name="announcementID">ID of the announcement to remove</param>
-    public void RemoveTeacherAnnouncement(string announcementID)
+    public virtual void RemoveTeacherAnnouncement(string announcementID)
     {
         TeacherAnnouncement? announcementToRemove = TeacherAnnouncements.FirstOrDefault(a => a.Id == announcementID);
         if (announcementToRemove is not null)
@@ -74,7 +74,7 @@ public class ClassroomStateService
     /// Toggles the archived status of a teacher announcement.
     /// </summary>
     /// <param name="announcementID">ID of the announcement to toggle</param>
-    public void ToggleHideTeacherAnnouncement(string announcementID)
+    public virtual void ToggleHideTeacherAnnouncement(string announcementID)
     {
         TeacherAnnouncement? announcementToRemove = TeacherAnnouncements.FirstOrDefault(a => a.Id == announcementID);
         if (announcementToRemove is not null)
@@ -87,7 +87,7 @@ public class ClassroomStateService
     /// Adds a student to the student list. 
     /// </summary>
     /// <param name="user">user ID to add to list</param>
-    public void AddStudent(string user)
+    public virtual void AddStudent(string user)
     {
         ConnectedStudents.Add(user);
     }
@@ -96,7 +96,7 @@ public class ClassroomStateService
     /// Removes a student to the student list. 
     /// </summary>
     /// <param name="user">user ID to add to list</param>
-    public void RemoveStudent(string user)
+    public virtual void RemoveStudent(string user)
     {
         ConnectedStudents.Remove(user);
     }
@@ -105,7 +105,7 @@ public class ClassroomStateService
     /// Adds a help request to the active help requests list.
     /// </summary>
     /// <param name="user">user that is asking for help</param>
-    public void AddHelpRequest(string user)
+    public virtual void AddHelpRequest(string user)
     {
         ActiveHelpRequests.Add(user);
     }
@@ -114,7 +114,7 @@ public class ClassroomStateService
     /// Removes a help request from the active help requests list.
     /// </summary>
     /// <param name="user">student to remove from list</param>
-    public void RemoveHelpRequest(string user)
+    public virtual void RemoveHelpRequest(string user)
     {
         ActiveHelpRequests.Remove(user);
     }
@@ -123,7 +123,7 @@ public class ClassroomStateService
     /// Adds a question to the active questions list.
     /// </summary>
     /// <param name="question">Question to add to list</param>
-    public void AddQuestion(TeacherQuestion question)
+    public virtual void AddQuestion(TeacherQuestion question)
     {
         ActiveQuestions.Add(question);
         Console.WriteLine("Question added!");
@@ -151,7 +151,7 @@ public class ClassroomStateService
     /// Removes a question from the active questions list.
     /// </summary>
     /// <param name="questionId">ID of question to delete</param>
-    public void DeleteTeacherQuestion(string questionId)
+    public virtual void DeleteTeacherQuestion(string questionId)
     {
         TeacherQuestion? questionToRemove = ActiveQuestions.FirstOrDefault(question => question.Id == questionId);
         if (questionToRemove != null)
@@ -169,7 +169,7 @@ public class ClassroomStateService
     /// Toggles the archived status of a question.
     /// </summary>
     /// <param name="questionID">ID of the question to toggle</param>
-    public void ToggleArchivedQuestion(string questionID)
+    public virtual void ToggleArchivedQuestion(string questionID)
     {
         TeacherQuestion? questionToRemove = ActiveQuestions.FirstOrDefault(question => question.Id == questionID);
         if (questionToRemove != null)
@@ -187,7 +187,7 @@ public class ClassroomStateService
     /// </summary>
     /// <param name="questionID">ID of the question to add an answer to</param>
     /// <param name="answer">Answer to add to the question</param>
-    public void AddAnswerToQuestion(string questionID, string answer)
+    public  virtual void AddAnswerToQuestion(string questionID, string answer)
     {
         TeacherQuestion? questionToAnswer = ActiveQuestions.FirstOrDefault(question => question.Id == questionID);
         if (questionToAnswer != null)

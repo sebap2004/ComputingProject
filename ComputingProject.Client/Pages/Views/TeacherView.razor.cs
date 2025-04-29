@@ -329,8 +329,6 @@ public partial class TeacherView : ComponentBase
     private void ReceiveActiveQuestions(List<TeacherQuestion> obj)
     {
         ActiveQuestions = obj;
-        ShowQuestion(SelectQuestionID);
-        Console.WriteLine("Refreshed show question list");
         StateHasChanged();
     }
 
