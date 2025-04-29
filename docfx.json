@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [
+            "ComputingProject/ComputingProject.csproj",
+            "ComputingProject.Client/ComputingProject.Client.csproj",
+            "ComputingProject.sln"
+          ],
+          "exclude": ["**/obj/**", "**/bin/**", "**/*.razor.cs"],
+          "src": "../ComputingProject"
+        }
+      ],
+      "dest": "api"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**/*.{md,yml}"
+        ],
+        "exclude": [
+          "_site/**"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**"
+        ]
+      }
+    ],
+    "output": "_site",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "globalMetadata": {
+      "_appName": "Computing Project Documentation",
+      "_appTitle": "Computing Project Documentation",
+      "_enableSearch": true,
+      "pdf": true
+    }
+  }
+}

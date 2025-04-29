@@ -16,4 +16,9 @@
     <PackageReference Include="MudBlazor" Version="8.*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.*" PrivateAssets="all" />
   </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Chats\StudentChat.razor" />
+    <_ContentIncludedByDefault Remove="Pages\Chats\TeacherChat.razor" />
+  </ItemGroup>
 </Project>

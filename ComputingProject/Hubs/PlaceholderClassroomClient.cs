@@ -6,81 +6,80 @@ using ComputingProject.Client.Services;
 
 namespace ComputingProject.Hubs;
 
-public class MockClassroomClient : IClassroomClient
-{
-    public bool IsConnected() => false;
 
-    public event Action<string, string, bool> OnMessageReceived; // No-op event
-    public Task StartAsync() => Task.CompletedTask;
-    public Task StopAsync() => Task.CompletedTask;
-    public Task GetMessage(string sender, string content, bool systemMessage) => Task.CompletedTask;
+/// <summary>
+/// Plcaeholder classroom client that does nothing. It is used to provide a default value for the client while it refreshes the page.
+/// This has been created so the website doesn't throw an error when refreshing the page.
+/// </summary>
+public class PlaceholderClassroomClient : IClassroomClient
+{
     public Task GetClassroomState(ClassroomState classroomState)
     {
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc/>
     public Task GetStudents(List<string> students)
     {
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc/>
     public Task GetActiveHelpRequests(List<string> students)
     {
         return Task.CompletedTask;
         
     }
 
+    /// <inheritdoc/>
     public Task GetActiveQuestions(List<TeacherQuestion> questions)
     {
         return Task.CompletedTask;
         
     }
 
+    /// <inheritdoc/>
     public Task GetAnnouncements(List<TeacherAnnouncement> announcements)
     {
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc/>
     public Task GetCurrentTask(string task)
     {
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc/>
     public Task GetStudentJoinedMessage(List<string> Users)
     {
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc/>
     public Task GetStudentLeftMessage(List<string> Users)
     {
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc/>
     public Task GetAcknowledgementForHelpRequest()
     {
         return Task.CompletedTask;
         
     }
 
+    /// <inheritdoc/>
     public Task GetResolutionForHelpRequest()
     {
         return Task.CompletedTask;
         
     }
 
+    /// <inheritdoc/>
     public Task AnswerTeacherQuestion(string questionID, string answer)
     {
         return Task.CompletedTask;
         
-    }
-
-    public Task SendStudentJoinedMessage(List<ClaimsPrincipal> Users)
-    {
-        return Task.CompletedTask;
-    }
-
-    public Task SendStudentLeftMessage(List<ClaimsPrincipal> Users)
-    {
-        return Task.CompletedTask;
     }
 }

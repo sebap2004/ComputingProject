@@ -11,23 +11,78 @@ namespace ComputingProject.Client.Pages.Views;
 
 public partial class StudentView : ComponentBase
 {
+    /// <summary>
+    /// Current cached classroom state. Updated from server
+    /// </summary>
     ClassroomState CurrentClassroomState;
+    
+    /// <summary>
+    /// Cached list of active questions. Updated from server
+    /// </summary>
     private List<TeacherQuestion> ActiveQuestions { get; set; } = new();
+    
+    /// <summary>
+    /// Cached list of announcements. Updated from server
+    /// </summary>
     public List<TeacherAnnouncement> Announcements { get; set; } = new();
+    
+    /// <summary>
+    /// Current cached task. Updated from server
+    /// </summary>
     public string CurrentTask { get; set; }
-    private string MessageInput;
+    
+    /// <summary>
+    /// Theme of the page
+    /// </summary>
     private MudTheme Theme = new MudTheme();
+    
+    
+    /// <summary>
+    /// Cached username retrieved from authentication state provider.
+    /// </summary>
     private string UserName { get; set; }
+    
+    /// <summary>
+    /// Cached user role retrieved from authentication state provider.
+    /// </summary>
     private string UserRole { get; set; }
-    private List<string> QuestionIDs = new();
+    
+    /// <summary>
+    /// Dictionary of answers to active questions. Stores the question ID as key and the answer as value.
+    /// Used to store the answer to a question when the user clicks the "send" button.
+    /// </summary>
     private Dictionary<string, string> Answers = new();
-    private string NotepadInput { get; set; }
+
+    /// <summary>
+    /// Icon displayed on the "Ask For Help" button, changing based on the student's hand up status.
+    /// </summary>
     private string HandUpIcon => HasHandUp ? Icons.Material.Filled.Cancel : Icons.Material.Filled.FrontHand;
+    
+    /// <summary>
+    /// Color of the "Ask For Help" button, changing based on the student's hand up status.'
+    /// </summary>
     private Color HandUpColor => HasHandUp ? Color.Error : Color.Primary;
+    
+    /// <summary>
+    /// Cached status of whether a help request has been acknowledged by the teacher.
+    /// </summary>
     private bool HelpRequestAcknowledged { get; set; }
+    
+    /// <summary>
+    /// If the student has hand up to the teacher.
+    /// </summary>
     public bool HasHandUp { get; set; }
+    
+    /// <summary>
+    /// If the student is connected to the classroom.
+    /// </summary>
     private bool IsConnected { get; set; }
 
+    /// <summary>
+    /// Converts links into a markup string to be rendered in the view
+    /// </summary>
+    /// <param name="text">Text to convert</param>
+    /// <returns>Marked up string</returns>
     private string ConvertLinks(string text)
     {
         if (string.IsNullOrEmpty(text))
@@ -38,6 +93,9 @@ public partial class StudentView : ComponentBase
             $"<a style=\"text-decoration: underline;\" href=\"{match.Value}\" target=\"_blank\">{match.Value}</a>");
     }
 
+    /// <summary>
+    /// Asks the teacher for help. Makes a call to the server to send a help request.
+    /// </summary>
     private async Task AskForHelp()
     {
         if (HasHandUp)
@@ -76,14 +134,17 @@ public partial class StudentView : ComponentBase
         }
     }
 
+    /// <summary>
+    /// Connects to the classroom hub. Called when the page is initialized.
+    /// </summary>
     private async Task ConnectToHub()
     {
-        ClassroomService.GetState += OnClassroomServiceOnGetState;
+        ClassroomService.GetState += OnGetClassroomState;
         ClassroomService.OnReceiveActiveQuestions += ReceiveActiveQuestions;
-        ClassroomService.OnResolveHelpRequest += ClassroomServiceOnOnResolveHelpRequest;
-        ClassroomService.OnAcknowledgeHelpRequest += ClassroomServiceOnOnAcknowledgeHelpRequest;
-        ClassroomService.OnReceiveAnnouncements += ClassroomServiceOnOnReceiveAnnouncements;
-        ClassroomService.OnReceiveCurrentTask += ClassroomServiceOnOnReceiveCurrentTask;
+        ClassroomService.OnResolveHelpRequest += OnResolveHelpRequest;
+        ClassroomService.OnAcknowledgeHelpRequest += OnHelpRequestAcknowledged;
+        ClassroomService.OnReceiveAnnouncements += ReceiveAnnouncements;
+        ClassroomService.OnReceiveCurrentTask += ReceiveCurrentTask;
 
         try
         {
@@ -102,7 +163,7 @@ public partial class StudentView : ComponentBase
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopLeft;
             Snackbar.Add("Successfully connected to classroom as " + UserName, Severity.Success);
             await ClassroomServer.GetActiveQuestions();
-            await ClassroomServer.GetClassroomState(UserName);
+            await ClassroomServer.GetClassroomState();
             await ClassroomServer.GetCurrentTask();
             await ClassroomServer.GetAnnouncements();
             IsConnected = true;
@@ -115,26 +176,40 @@ public partial class StudentView : ComponentBase
         }
     }
 
-    private void ClassroomServiceOnOnReceiveCurrentTask(string obj)
+    /// <summary>
+    /// Event function that is called when the classroom service receives a message from the server.
+    /// </summary>
+    /// <param name="obj"></param>
+    private void ReceiveCurrentTask(string obj)
     {
         CurrentTask = obj;
         StateHasChanged();
     }
 
-    private void ClassroomServiceOnOnReceiveAnnouncements(List<TeacherAnnouncement> obj)
+    /// <summary>
+    /// Event function that is called when the classroom service receives an announcement from the server.
+    /// </summary>
+    /// <param name="obj">List of announcements from the server</param>
+    private void ReceiveAnnouncements(List<TeacherAnnouncement> obj)
     {
         Announcements = obj;
         StateHasChanged();
     }
 
-    private void ClassroomServiceOnOnAcknowledgeHelpRequest()
+    /// <summary>
+    /// Event function that is called when the classroom service acknowledges this client's help request.
+    /// </summary>
+    private void OnHelpRequestAcknowledged()
     {
         Console.WriteLine("Acknowledge Help Request");
         HelpRequestAcknowledged = true;
         StateHasChanged();
     }
 
-    private void ClassroomServiceOnOnResolveHelpRequest()
+    /// <summary>
+    /// Event function that is called when the classroom service resolves this client's help request.
+    /// </summary>
+    private void OnResolveHelpRequest()
     {
         Console.WriteLine("Resolve Help Request");
         Snackbar.Add("Your question has been answered!", Severity.Success);
@@ -143,15 +218,17 @@ public partial class StudentView : ComponentBase
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Event function that is called when the classroom service receives a list of active questions from the server.
+    /// </summary>
+    /// <param name="obj">List of active questions</param>
     private void ReceiveActiveQuestions(List<TeacherQuestion> obj)
     {
         ActiveQuestions = obj;
         Answers.Clear();
-        QuestionIDs.Clear();
         foreach (var question in ActiveQuestions)
         {
             Answers.Add(question.Id, "");
-            QuestionIDs.Add(question.Id);
         }
 
         StateHasChanged();
@@ -162,12 +239,20 @@ public partial class StudentView : ComponentBase
         }
     }
 
-    private void OnClassroomServiceOnGetState(ClassroomState state)
+    /// <summary>
+    /// Event function that gets the classroom's state
+    /// </summary>
+    /// <param name="state">State recieved</param>
+    private void OnGetClassroomState(ClassroomState state)
     {
         CurrentClassroomState = state;
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Responds to a question and sends response to the server.
+    /// </summary>
+    /// <param name="questionID">Question to add a response to</param>
     async Task RespondToQuestion(string questionID)
     {
         Console.WriteLine("Trying to respond to question with id: " + questionID);
@@ -183,6 +268,12 @@ public partial class StudentView : ComponentBase
         await ClassroomServer.AnswerTeacherQuestion(UserName, questionID, answer);
     }
 
+    /// <summary>
+    /// Keyboard event handler called whenever a key is pressed.
+    /// If the enter key is pressed, the user sends a response to the question.
+    /// </summary>
+    /// <param name="e">Event object</param>
+    /// <param name="questionID">question ID to respond to</param>
     private async Task Enter(KeyboardEventArgs e, string questionID)
     {
         if (e.Code == "Enter" || e.Code == "NumpadEnter")

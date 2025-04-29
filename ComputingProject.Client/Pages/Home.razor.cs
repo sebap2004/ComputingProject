@@ -1,11 +1,12 @@
 ﻿using System.Security.Claims;
 using ComputingProject.Client.Dialogs;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 
 namespace ComputingProject.Client.Pages;
 
-public partial class Home
+public partial class Home : ComponentBase
 {
     private string? UserName {get; set;}
     private string? UserRole {get; set;}

@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using ComputingProject.Client.Providers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 

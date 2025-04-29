@@ -10,7 +10,7 @@ public class MockClassroomServer : IClassroomServer
         return Task.CompletedTask;
     }
 
-    public Task GetClassroomState(string user) => Task.CompletedTask;
+    public Task GetClassroomState() => Task.CompletedTask;
     public Task GetStudents()
     {
         return Task.CompletedTask;

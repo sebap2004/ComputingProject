@@ -4,7 +4,11 @@ namespace ComputingProject.Client.Services;
 
 public static class RandomIDGenerator
 {
-    // Code from stack overflow: https://stackoverflow.com/a/44960751
+    /// <summary>
+    /// Generates a random ID 11 characters long.
+    /// Code from stack overflow: https://stackoverflow.com/a/44960751
+    /// </summary>
+    /// <returns>Random string</returns>
     public static string GenerateRandomID()
     {
         StringBuilder builder = new StringBuilder();

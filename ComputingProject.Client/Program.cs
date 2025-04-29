@@ -1,3 +1,4 @@
+using ComputingProject.Client.Providers;
 using ComputingProject.Client.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;

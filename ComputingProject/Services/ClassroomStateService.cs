@@ -3,35 +3,64 @@ using ComputingProject.Client.Services;
 
 namespace ComputingProject.Services;
 
+/// <summary>
+/// Classroom state services that manages and updates the state of a virtual classroom, including tracking students, help requests,
+/// teacher announcements, and questions.
+/// </summary>
 public class ClassroomStateService
 {
-    // Current classroom state enum
+    /// <summary>
+    /// Current classroom state enum
+    /// </summary>
     public ClassroomState classroomState { get; set; }
 
-    // Current users connected to the hub
+    /// <summary>
+    /// Current users connected to the hub
+    /// </summary>
     public List<string> ConnectedStudents { get; set; } = new();
 
-    // Current active help requests. String is the student's username
+    /// <summary>
+    /// Current active help requests. String is the student's username
+    /// </summary>
     public List<string> ActiveHelpRequests { get; set; } = new();
 
-    // Current active questions in the session. Uses teacher object
+    /// <summary>
+    /// Current active questions in the session. Uses teacher question object
+    /// </summary>
     public List<TeacherQuestion> ActiveQuestions { get; set; } = new();
     
-    // Current active announcements in session.
+    /// <summary>
+    /// Current active announcements in session.
+    /// </summary>
     public List<TeacherAnnouncement> TeacherAnnouncements { get; set; } = new();
     
+    /// <summary>
+    /// Current task of the classroom
+    /// </summary>
     public string CurrentTask { get; set; }
 
+    /// <summary>
+    /// Sets the current classroom task
+    /// </summary>
+    /// <param name="task">Task to set</param>
     public void SetCurrentTask(string task)
     {
         CurrentTask = task;
     }
 
+    /// <summary>
+    /// Adds a teacher announcement to the classroom.
+    /// </summary>
+    /// <param name="announcement">Announcement to add</param>
     public void AddTeacherAnnouncement(TeacherAnnouncement announcement)
     {
         TeacherAnnouncements.Add(announcement);
     }
 
+    /// <summary>
+    /// Removes a teacher announcement from the classroom.
+    /// </summary>
+    /// <param name="announcementID">ID of the announcement to remove</param>
     public void RemoveTeacherAnnouncement(string announcementID)
     {
         TeacherAnnouncement? announcementToRemove = TeacherAnnouncements.FirstOrDefault(a => a.Id == announcementID);
@@ -41,6 +70,10 @@ public class ClassroomStateService
         }
     }
     
+    /// <summary>
+    /// Toggles the archived status of a teacher announcement.
+    /// </summary>
+    /// <param name="announcementID">ID of the announcement to toggle</param>
     public void ToggleHideTeacherAnnouncement(string announcementID)
     {
         TeacherAnnouncement? announcementToRemove = TeacherAnnouncements.FirstOrDefault(a => a.Id == announcementID);
@@ -50,28 +83,46 @@ public class ClassroomStateService
         }
     }
     
-    // Adds a student to the student list. String is user ID
+    /// <summary>
+    /// Adds a student to the student list. 
+    /// </summary>
+    /// <param name="user">user ID to add to list</param>
     public void AddStudent(string user)
     {
         ConnectedStudents.Add(user);
     }
 
-    // Removes a student to the student list. String is user ID
+    /// <summary>
+    /// Removes a student to the student list. 
+    /// </summary>
+    /// <param name="user">user ID to add to list</param>
     public void RemoveStudent(string user)
     {
         ConnectedStudents.Remove(user);
     }
 
+    /// <summary>
+    /// Adds a help request to the active help requests list.
+    /// </summary>
+    /// <param name="user">user that is asking for help</param>
     public void AddHelpRequest(string user)
     {
         ActiveHelpRequests.Add(user);
     }
 
+    /// <summary>
+    /// Removes a help request from the active help requests list.
+    /// </summary>
+    /// <param name="user">student to remove from list</param>
     public void RemoveHelpRequest(string user)
     {
         ActiveHelpRequests.Remove(user);
     }
 
+    /// <summary>
+    /// Adds a question to the active questions list.
+    /// </summary>
+    /// <param name="question">Question to add to list</param>
     public void AddQuestion(TeacherQuestion question)
     {
         ActiveQuestions.Add(question);
@@ -96,6 +147,10 @@ public class ClassroomStateService
         }
     }
 
+    /// <summary>
+    /// Removes a question from the active questions list.
+    /// </summary>
+    /// <param name="questionId">ID of question to delete</param>
     public void DeleteTeacherQuestion(string questionId)
     {
         TeacherQuestion? questionToRemove = ActiveQuestions.FirstOrDefault(question => question.Id == questionId);
@@ -109,6 +164,11 @@ public class ClassroomStateService
         }
     }
     
+    
+    /// <summary>
+    /// Toggles the archived status of a question.
+    /// </summary>
+    /// <param name="questionID">ID of the question to toggle</param>
     public void ToggleArchivedQuestion(string questionID)
     {
         TeacherQuestion? questionToRemove = ActiveQuestions.FirstOrDefault(question => question.Id == questionID);
@@ -122,6 +182,11 @@ public class ClassroomStateService
         }
     }
 
+    /// <summary>
+    /// Adds an answer to a question.
+    /// </summary>
+    /// <param name="questionID">ID of the question to add an answer to</param>
+    /// <param name="answer">Answer to add to the question</param>
     public void AddAnswerToQuestion(string questionID, string answer)
     {
         TeacherQuestion? questionToAnswer = ActiveQuestions.FirstOrDefault(question => question.Id == questionID);

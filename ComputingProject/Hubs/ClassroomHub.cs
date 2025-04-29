@@ -29,6 +29,10 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
         ClassroomStateService = stateService;
     }
     
+    /// <summary>
+    /// Called when a new client connects to the hub.
+    /// Adds a client to their respective group based on their role.
+    /// </summary>
     public override Task OnConnectedAsync()
     {
         Console.WriteLine("New Connection");
@@ -53,7 +57,11 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
     }
     
     
-
+    /// <summary>
+    /// Called when a client disconnects from the hub.
+    /// Dispatches relevant messages to relevant clients based on their role.
+    /// </summary>
+    /// <param name="exception">If the disconnection was caled by an exception.</param>
     public override Task OnDisconnectedAsync(Exception? exception)
     {
         Console.WriteLine("New Disconnection");
@@ -69,50 +77,45 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
         }
         return Task.CompletedTask;
     }
-
-    public async Task SendMessage(string sender, string content, bool systemMessage)
-    {
-        await Clients.All.GetMessage(sender, content, systemMessage);
-    }
     
-    public async Task SendMessageToTeacher(string sender, string content, bool systemMessage)
+    /// <inheritdoc/>
+    public async Task GetClassroomState()
     {
-        await Clients.User("Teacher").GetMessage(sender + " - TEACHER ONLY", content, systemMessage);
-        await Clients.User(sender).GetMessage(sender, content, systemMessage);
-    }
-
-    public async Task GetClassroomState(string UserName)
-    {
-        Console.WriteLine("Sent state to " + UserName);
         await Clients.All.GetClassroomState(ClassroomStateService.classroomState);
     }
 
+    /// <inheritdoc/>
     public async Task GetStudents()
     {
         Console.WriteLine("Get student list, count: " + ClassroomStateService.ConnectedStudents.Count);
         await Clients.All.GetStudents(ClassroomStateService.ConnectedStudents);
     }
 
+    /// <inheritdoc/>
     public async Task GetActiveHelpRequests()
     {
         await Clients.All.GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
     }
 
+    /// <inheritdoc/>
     public async Task GetActiveQuestions()
     {
         await Clients.All.GetActiveQuestions(ClassroomStateService.ActiveQuestions);
     }
 
+    /// <inheritdoc/>
     public async Task GetCurrentTask()
     {
         await Clients.All.GetCurrentTask(ClassroomStateService.CurrentTask);
     }
 
+    /// <inheritdoc/>
     public async Task GetAnnouncements()
     {
         await Clients.All.GetAnnouncements(ClassroomStateService.TeacherAnnouncements);
     }
 
+    /// <inheritdoc/>
     public async Task SendTeacherQuestion(TeacherQuestion question)
     {
         Console.WriteLine("Sending teacher question to to connections");
@@ -120,6 +123,7 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
         await Clients.All.GetActiveQuestions(ClassroomStateService.ActiveQuestions);
     }
 
+    /// <inheritdoc/>
     public async Task AnswerTeacherQuestion(string studentID, string questionID, string answer)
     {
         ClassroomStateService.AddAnswerToQuestion(questionID, answer);
@@ -128,18 +132,21 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
         Console.WriteLine("sending teacher question to to connections " + studentID);
     }
 
+    /// <inheritdoc/>
     public async Task SendHelpRequest(string requestID)
     {
         ClassroomStateService.AddHelpRequest(requestID);
         await Clients.Group("Teacher").GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
     }
 
+    /// <inheritdoc/>
     public async Task CancelHelpRequest(string requestID)
     {
         ClassroomStateService.RemoveHelpRequest(requestID);
         await Clients.Group("Teacher").GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
     }
 
+    /// <inheritdoc/>
     public async Task AcknowledgeHelpRequest(string requestID)
     {
         await Clients.User(requestID).GetAcknowledgementForHelpRequest();
@@ -147,6 +154,7 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
         Console.WriteLine("Sending acknowledgement to " + requestID);
     }
 
+    /// <inheritdoc/>
     public async Task ResolveHelpRequest(string requestID)
     {
         ClassroomStateService.RemoveHelpRequest(requestID);
@@ -155,43 +163,49 @@ public class Classroom : Hub<IClassroomClient>, IClassroomServer
         await Clients.Group("Teacher").GetActiveHelpRequests(ClassroomStateService.ActiveHelpRequests);
     }
 
+    /// <inheritdoc/>
     public async Task ArchiveTeacherQuestion(string questionID)
     {
         ClassroomStateService.ToggleArchivedQuestion(questionID);
         await Clients.All.GetActiveQuestions(ClassroomStateService.ActiveQuestions);
     }
 
+    /// <inheritdoc/>
     public async Task SetClassroomState(ClassroomState stateToChangeTo)
     {
         ClassroomStateService.classroomState = stateToChangeTo;
         await Clients.All.GetClassroomState(ClassroomStateService.classroomState);
-        await Clients.All.GetMessage("", "Set the classroom state to " + stateToChangeTo, true);
     }
 
+    /// <inheritdoc/>
     public async Task DeleteTeacherQuestion(string questionId)
     {
         ClassroomStateService.DeleteTeacherQuestion(questionId);
         await Clients.All.GetActiveQuestions(ClassroomStateService.ActiveQuestions);
     }
 
+    /// <inheritdoc/>
     public async Task AddAnnouncement(TeacherAnnouncement announcement)
     {
         ClassroomStateService.AddTeacherAnnouncement(announcement);
         await Clients.All.GetAnnouncements(ClassroomStateService.TeacherAnnouncements);
     }
 
+    /// <inheritdoc/>
     public async Task RemoveAnnouncement(string announcementId)
     {
         ClassroomStateService.RemoveTeacherAnnouncement(announcementId);
         await Clients.All.GetAnnouncements(ClassroomStateService.TeacherAnnouncements);
     }
 
+    /// <inheritdoc/>
     public async Task ToggleHideAnnouncement(string announcementId)
     {
         ClassroomStateService.ToggleHideTeacherAnnouncement(announcementId);
         await Clients.All.GetAnnouncements(ClassroomStateService.TeacherAnnouncements);
     }
 
+    /// <inheritdoc/>
     public async Task SetCurrentTask(string task)
     {
         ClassroomStateService.SetCurrentTask(task);

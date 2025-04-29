@@ -35,7 +35,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<IClassroomService, MockClassroomService>();
+builder.Services.AddScoped<IClassroomService, PlaceholderClassroomService>();
 builder.Services.AddScoped<IClassroomServer, MockClassroomServer>();
 builder.Services.AddSingleton<ClassroomStateService>();
 
