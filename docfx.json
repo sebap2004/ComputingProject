@@ -13,7 +13,9 @@
           "src": "../ComputingProject"
         }
       ],
-      "dest": "api"
+      "dest": "api",
+      "allowCompilationErrors": true,
+      "includePrivateMembers": true
     }
   ],
   "build": {

@@ -1,13 +1,10 @@
 using MudBlazor.Services;
-using ComputingProject.Client.Pages;
 using ComputingProject.Client.Services;
 using ComputingProject.Components;
 using ComputingProject.Hubs;
 using ComputingProject.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.SignalR.Client;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
